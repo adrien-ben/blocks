@@ -3,11 +3,14 @@ package com.adrien.games.blocks.world;
 import com.adrien.games.bagl.core.math.Vector3;
 import com.adrien.games.blocks.rendering.chunk.ChunkMeshPool;
 import com.adrien.games.blocks.utils.Point;
+import com.adrien.games.blocks.world.block.Block;
 import com.adrien.games.blocks.world.block.BlockType;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.Objects;
+import java.util.Optional;
+import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 public class World {
@@ -55,22 +58,60 @@ public class World {
         }
     }
 
-    public void removeBlock(final int x, final int y, final int z) {
-        this.addBlock(x, y, z, BlockType.AIR);
+    public boolean removeBlock(final Vector3 position) {
+        return this.addBlock(position, BlockType.AIR);
     }
 
-    public void addBlock(final int x, final int y, final int z, final BlockType type) {
+    public boolean addBlock(final Vector3 position, final BlockType type) {
+        final int x = (int) Math.floor(position.getX());
+        final int y = (int) Math.floor(position.getY());
+        final int z = (int) Math.floor(position.getZ());
+
         final int chunkX = (int) Math.floor((float) x / CHUNK_WIDTH);
         final int chunkY = (int) Math.floor((float) y / CHUNK_HEIGHT);
         final int chunkZ = (int) Math.floor((float) z / CHUNK_DEPTH);
         if (chunkX < this.left || chunkX >= this.right || chunkY != 0 || chunkZ < this.close || chunkZ >= this.far) {
-            throw new IllegalArgumentException("Impossible to add block outside of the loaded area (" + x + ", " + y + ", " + z + ")");
+            return false;
         }
 
-        final Chunk chunk = this.chunks[this.indexFromPosition(chunkX - left, chunkZ - close)];
+        final Chunk chunk = this.chunks[this.indexFromPosition(chunkX - this.left, chunkZ - this.close)];
         if (chunk.addBlock(x - chunkX * CHUNK_WIDTH, y - chunkY * CHUNK_HEIGHT, z - chunkZ * CHUNK_DEPTH, type)) {
             this.loader.load(chunk);
+            return true;
         }
+        return false;
+    }
+
+    public Optional<Block> getBlock(final Vector3 position, final Vector3 direction, final float maxDistance, final Predicate<Block> predicate) {
+        float distance = 0;
+        final float step = 0.25f;
+        direction.normalise().scale(step);
+        Optional<Block> block = Optional.empty();
+        while (distance <= maxDistance && !(block = this.getBlockIfMatches(position, predicate)).isPresent()) {
+            position.add(direction);
+            distance += step;
+        }
+        return block;
+    }
+
+    private Optional<Block> getBlockIfMatches(final Vector3 position, final Predicate<Block> predicate) {
+        final int x = (int) Math.floor(position.getX());
+        final int y = (int) Math.floor(position.getY());
+        final int z = (int) Math.floor(position.getZ());
+
+        final int chunkX = (int) Math.floor((float) x / CHUNK_WIDTH);
+        final int chunkY = (int) Math.floor((float) y / CHUNK_HEIGHT);
+        final int chunkZ = (int) Math.floor((float) z / CHUNK_DEPTH);
+        if (chunkX < this.left || chunkX >= this.right || chunkY != 0 || chunkZ < this.close || chunkZ >= this.far) {
+            return Optional.empty();
+        }
+        final Chunk chunk = this.chunks[this.indexFromPosition(chunkX - left, chunkZ - close)];
+        final Block block = chunk.getBlock(x - chunkX * CHUNK_WIDTH, y - chunkY * CHUNK_HEIGHT, z - chunkZ * CHUNK_DEPTH);
+
+        if (Objects.nonNull(predicate) && !predicate.test(block)) {
+            return Optional.empty();
+        }
+        return Optional.of(block);
     }
 
     private void refreshWorld(final int stepX, final int stepZ) {
