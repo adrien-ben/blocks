@@ -52,4 +52,12 @@ public class Block {
         this.type = type;
     }
 
+    public boolean isAir() {
+        return BlockType.AIR.equals(this.type);
+    }
+
+    public boolean isNotAir() {
+        return !this.isAir();
+    }
+
 }
