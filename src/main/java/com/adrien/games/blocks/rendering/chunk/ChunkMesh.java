@@ -192,6 +192,7 @@ public class ChunkMesh {
         LOG.trace("Destroying chunk mesh");
         GL30.glBindVertexArray(0);
         GL15.glDeleteBuffers(this.pbo);
+        GL15.glDeleteBuffers(this.cbo);
         GL30.glDeleteVertexArrays(this.vao);
     }
 
