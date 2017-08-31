@@ -20,8 +20,10 @@ public class ChunkMesh {
     private static final int ELEMENT_PER_VERTEX = 5;
     private static final int FLOAT_SIZE_IN_BYTES = Float.SIZE / 8;
     public static final int INDICES_PER_FACE = 6;
-    private static final int MAX_VERTEX_COUNT = World.BLOCK_PER_CHUNK * MAX_FACE_PER_BLOCK * VERTICES_PER_FACE;
-    public static final int MAX_INDEX_COUNT = World.BLOCK_PER_CHUNK * MAX_FACE_PER_BLOCK * INDICES_PER_FACE;
+    private static final int MAX_VISIBLE_BLOCK_PER_CHUNK = World.BLOCK_PER_CHUNK / 2 + 1;
+    public static final int MAX_FACE_COUNT = MAX_VISIBLE_BLOCK_PER_CHUNK * MAX_FACE_PER_BLOCK;
+    private static final int MAX_VERTEX_COUNT = MAX_FACE_COUNT * VERTICES_PER_FACE;
+    public static final int MAX_INDEX_COUNT = MAX_FACE_COUNT * INDICES_PER_FACE;
 
     private float[] vertices;
     private int vao;
@@ -64,11 +66,11 @@ public class ChunkMesh {
 
     public void update(final Chunk chunk) {
         LOG.trace("Updating mesh for chunk {}", chunk);
-        this.uploaded = false;
         this.faceCount = 0;
         chunk.getBlocks()
-                .filter(block -> !BlockType.AIR.equals(block.getType()))
+                .filter(Block::isNotAir)
                 .forEach(block -> this.computeBlockFaces(chunk, block));
+        this.uploaded = false;
         this.ready = true;
     }
 
@@ -82,7 +84,6 @@ public class ChunkMesh {
         }
 
         LOG.trace("Uploading mesh data to GPU");
-
         GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, this.vbo);
         GL15.glBufferSubData(GL15.GL_ARRAY_BUFFER, 0, this.vertices);
         GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
@@ -97,27 +98,27 @@ public class ChunkMesh {
         final int worldY = block.getWorldY();
         final int worldZ = block.getWorldZ();
         final BlockType type = block.getType();
-        if (indexX == 0 || BlockType.AIR.equals(chunk.getBlock(indexX - 1, indexY, indexZ).getType())) {
+        if (indexX == 0 || chunk.getBlock(indexX - 1, indexY, indexZ).isAir()) {
             this.addLeftFace(worldX, worldY, worldZ, type);
             this.faceCount++;
         }
-        if (indexX == World.CHUNK_WIDTH - 1 || BlockType.AIR.equals(chunk.getBlock(indexX + 1, indexY, indexZ).getType())) {
+        if (indexX == World.CHUNK_WIDTH - 1 || chunk.getBlock(indexX + 1, indexY, indexZ).isAir()) {
             this.addRightFace(worldX, worldY, worldZ, type);
             this.faceCount++;
         }
-        if (indexY == 0 || BlockType.AIR.equals(chunk.getBlock(indexX, indexY - 1, indexZ).getType())) {
+        if (indexY == 0 || chunk.getBlock(indexX, indexY - 1, indexZ).isAir()) {
             this.addBottomFace(worldX, worldY, worldZ, type);
             this.faceCount++;
         }
-        if (indexY == World.CHUNK_HEIGHT - 1 || BlockType.AIR.equals(chunk.getBlock(indexX, indexY + 1, indexZ).getType())) {
+        if (indexY == World.CHUNK_HEIGHT - 1 || chunk.getBlock(indexX, indexY + 1, indexZ).isAir()) {
             this.addTopFace(worldX, worldY, worldZ, type);
             this.faceCount++;
         }
-        if (indexZ == 0 || BlockType.AIR.equals(chunk.getBlock(indexX, indexY, indexZ - 1).getType())) {
+        if (indexZ == 0 || chunk.getBlock(indexX, indexY, indexZ - 1).isAir()) {
             this.addBackFace(worldX, worldY, worldZ, type);
             this.faceCount++;
         }
-        if (indexZ == World.CHUNK_DEPTH - 1 || BlockType.AIR.equals(chunk.getBlock(indexX, indexY, indexZ + 1).getType())) {
+        if (indexZ == World.CHUNK_DEPTH - 1 || chunk.getBlock(indexX, indexY, indexZ + 1).isAir()) {
             this.addFrontFace(worldX, worldY, worldZ, type);
             this.faceCount++;
         }
