@@ -72,7 +72,7 @@ public class Blocks implements Game {
         final Vector3 position = new Vector3(this.camera.getPosition());
         final Vector3 direction = new Vector3(this.camera.getDirection());
 
-        final Optional<Block> pointedBlock = this.world.getBlock(position, direction, 2, Block::isNotAir);
+        final Optional<Block> pointedBlock = this.world.getBlock(position, direction, 3, Block::isNotAir);
         this.pointedBlock = pointedBlock.orElse(null);
 
         if (Input.wasMouseButtonPressed(GLFW.GLFW_MOUSE_BUTTON_2)) {
