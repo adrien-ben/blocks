@@ -17,17 +17,22 @@ public class ChunkMesh {
 
     private static final int MAX_FACE_PER_BLOCK = 6;
     public static final int VERTICES_PER_FACE = 4;
-    private static final int ELEMENT_PER_VERTEX = 5;
+    private static final int ELEMENT_PER_POSITION = 3;
+    private static final int ELEMENT_PER_COORDINATES = 2;
     private static final int FLOAT_SIZE_IN_BYTES = Float.SIZE / 8;
+    private static final int SHORT_SIZE_IN_BYTES = Short.SIZE / 8;
     public static final int INDICES_PER_FACE = 6;
     private static final int MAX_VISIBLE_BLOCK_PER_CHUNK = World.BLOCK_PER_CHUNK / 2 + 1;
     public static final int MAX_FACE_COUNT = MAX_VISIBLE_BLOCK_PER_CHUNK * MAX_FACE_PER_BLOCK;
     private static final int MAX_VERTEX_COUNT = MAX_FACE_COUNT * VERTICES_PER_FACE;
     public static final int MAX_INDEX_COUNT = MAX_FACE_COUNT * INDICES_PER_FACE;
 
-    private float[] vertices;
+    private short[] positions;
+    private float[] coordinates;
+
     private int vao;
-    private int vbo;
+    private int pbo;
+    private int cbo;
     private int faceCount;
 
     private boolean ready;
@@ -35,20 +40,25 @@ public class ChunkMesh {
 
     public ChunkMesh() {
         LOG.trace("Initializing OpenGL buffers for chunk mesh");
-        this.vertices = new float[MAX_VERTEX_COUNT * ELEMENT_PER_VERTEX];
+        this.positions = new short[MAX_VERTEX_COUNT * ELEMENT_PER_POSITION];
+        this.coordinates = new float[MAX_VERTEX_COUNT * ELEMENT_PER_COORDINATES];
 
         this.vao = GL30.glGenVertexArrays();
         GL30.glBindVertexArray(this.vao);
 
-        this.vbo = GL15.glGenBuffers();
-        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, this.vbo);
-        GL15.glBufferData(GL15.GL_ARRAY_BUFFER, this.vertices, GL15.GL_DYNAMIC_DRAW);
+        this.pbo = GL15.glGenBuffers();
+        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, this.pbo);
+        GL15.glBufferData(GL15.GL_ARRAY_BUFFER, this.positions, GL15.GL_DYNAMIC_DRAW);
 
         GL20.glEnableVertexAttribArray(0);
-        GL20.glVertexAttribPointer(0, 3, GL11.GL_FLOAT, false, ELEMENT_PER_VERTEX * FLOAT_SIZE_IN_BYTES, 0);
+        GL30.glVertexAttribIPointer(0, ELEMENT_PER_POSITION, GL11.GL_SHORT, ELEMENT_PER_POSITION * SHORT_SIZE_IN_BYTES, 0);
+
+        this.cbo = GL15.glGenBuffers();
+        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, this.cbo);
+        GL15.glBufferData(GL15.GL_ARRAY_BUFFER, this.coordinates, GL15.GL_DYNAMIC_DRAW);
 
         GL20.glEnableVertexAttribArray(1);
-        GL20.glVertexAttribPointer(1, 2, GL11.GL_FLOAT, false, ELEMENT_PER_VERTEX * FLOAT_SIZE_IN_BYTES, 3 * FLOAT_SIZE_IN_BYTES);
+        GL20.glVertexAttribPointer(1, ELEMENT_PER_COORDINATES, GL11.GL_FLOAT, false, ELEMENT_PER_COORDINATES * FLOAT_SIZE_IN_BYTES, 0);
 
         GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
         GL30.glBindVertexArray(0);
@@ -84,8 +94,12 @@ public class ChunkMesh {
         }
 
         LOG.trace("Uploading mesh data to GPU");
-        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, this.vbo);
-        GL15.glBufferSubData(GL15.GL_ARRAY_BUFFER, 0, this.vertices);
+        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, this.pbo);
+        GL15.glBufferSubData(GL15.GL_ARRAY_BUFFER, 0, this.positions);
+
+        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, this.cbo);
+        GL15.glBufferSubData(GL15.GL_ARRAY_BUFFER, 0, this.coordinates);
+
         GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
         this.uploaded = true;
     }
@@ -166,18 +180,18 @@ public class ChunkMesh {
         this.setVertexValues(this.faceCount * VERTICES_PER_FACE + 3, x + 1, y + 1, z + 1, type.getRightUV(), type.getTopUV());
     }
 
-    private void setVertexValues(final int index, final float x, final float y, final float z, final float u, final float v) {
-        this.vertices[index * ELEMENT_PER_VERTEX] = x;
-        this.vertices[index * ELEMENT_PER_VERTEX + 1] = y;
-        this.vertices[index * ELEMENT_PER_VERTEX + 2] = z;
-        this.vertices[index * ELEMENT_PER_VERTEX + 3] = u;
-        this.vertices[index * ELEMENT_PER_VERTEX + 4] = v;
+    private void setVertexValues(final int index, final int x, final int y, final int z, final float u, final float v) {
+        this.positions[index * ELEMENT_PER_POSITION] = (short) x;
+        this.positions[index * ELEMENT_PER_POSITION + 1] = (short) y;
+        this.positions[index * ELEMENT_PER_POSITION + 2] = (short) z;
+        this.coordinates[index * ELEMENT_PER_COORDINATES] = u;
+        this.coordinates[index * ELEMENT_PER_COORDINATES + 1] = v;
     }
 
     public void destroy() {
         LOG.trace("Destroying chunk mesh");
         GL30.glBindVertexArray(0);
-        GL15.glDeleteBuffers(this.vbo);
+        GL15.glDeleteBuffers(this.pbo);
         GL30.glDeleteVertexArrays(this.vao);
     }
 
