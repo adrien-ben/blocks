@@ -14,7 +14,7 @@ public class ChunkRenderer {
     private final IndexBuffer indexBuffer;
 
     public ChunkRenderer() {
-        this.shader = new Shader().addVertexShader("cube.vert").addFragmentShader("cube.frag").compile();
+        this.shader = new Shader().addVertexShader("chunk.vert").addFragmentShader("chunk.frag").compile();
         this.indexBuffer = new IndexBuffer(BufferUsage.STATIC_DRAW, ChunkMesh.MAX_INDEX_COUNT);
         this.generateIndices();
     }

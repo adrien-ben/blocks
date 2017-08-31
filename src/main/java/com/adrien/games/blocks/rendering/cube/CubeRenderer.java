@@ -12,7 +12,7 @@ public class CubeRenderer {
     private Shader shader;
 
     public CubeRenderer() {
-        this.shader = new Shader().addVertexShader("cube.vert").addFragmentShader("cube.frag").compile();
+        this.shader = new Shader().addVertexShader("chunk.vert").addFragmentShader("chunk.frag").compile();
     }
 
     public void renderCube(final CubeMesh model, final Camera camera, final Texture texture) {
