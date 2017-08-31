@@ -3,6 +3,7 @@ package com.adrien.games.blocks.world;
 import com.adrien.games.bagl.core.math.Vector3;
 import com.adrien.games.blocks.rendering.chunk.ChunkMeshPool;
 import com.adrien.games.blocks.utils.Point;
+import com.adrien.games.blocks.world.block.BlockType;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -27,6 +28,11 @@ public class World {
     private final Point marker;
     private final Loader loader;
 
+    private int left;
+    private int right;
+    private int close;
+    private int far;
+
     public World() {
         this.chunkMeshPool = new ChunkMeshPool(World.WORLD_MAX_WIDTH * World.WORLD_MAX_DEPTH * 2);
         this.chunks = new Chunk[WORLD_MAX_WIDTH * WORLD_MAX_DEPTH];
@@ -49,8 +55,32 @@ public class World {
         }
     }
 
+    public void removeBlock(final int x, final int y, final int z) {
+        this.addBlock(x, y, z, BlockType.AIR);
+    }
+
+    public void addBlock(final int x, final int y, final int z, final BlockType type) {
+        final int chunkX = (int) Math.floor((float) x / CHUNK_WIDTH);
+        final int chunkY = (int) Math.floor((float) y / CHUNK_HEIGHT);
+        final int chunkZ = (int) Math.floor((float) z / CHUNK_DEPTH);
+        if (chunkX < this.left || chunkX >= this.right || chunkY != 0 || chunkZ < this.close || chunkZ >= this.far) {
+            throw new IllegalArgumentException("Impossible to add block outside of the loaded area (" + x + ", " + y + ", " + z + ")");
+        }
+
+        final Chunk chunk = this.chunks[this.indexFromPosition(chunkX - left, chunkZ - close)];
+        if (chunk.addBlock(x - chunkX * CHUNK_WIDTH, y - chunkY * CHUNK_HEIGHT, z - chunkZ * CHUNK_DEPTH, type)) {
+            this.loader.load(chunk);
+        }
+    }
+
     private void refreshWorld(final int stepX, final int stepZ) {
         LOG.trace("Loading world around {}", this.marker);
+
+        this.left = this.marker.getX() - WORLD_MAX_WIDTH / 2;
+        this.right = this.left + WORLD_MAX_WIDTH;
+        this.close = this.marker.getY() - WORLD_MAX_DEPTH / 2;
+        this.far = this.close + WORLD_MAX_DEPTH;
+
         for (int x = 0; x < WORLD_MAX_WIDTH; x++) {
             for (int z = 0; z < WORLD_MAX_DEPTH; z++) {
                 final int oldX = x + stepX;
@@ -69,8 +99,7 @@ public class World {
                 if (this.isInBound(oldX, oldZ) && Objects.nonNull(this.chunks[oldIndex])) {
                     this.buffer[index] = this.chunks[oldIndex];
                 } else {
-                    final Chunk newChunk = new Chunk(x + this.marker.getX() - WORLD_MAX_WIDTH / 2, 0,
-                            z + this.marker.getY() - WORLD_MAX_DEPTH / 2, this.chunkMeshPool);
+                    final Chunk newChunk = new Chunk(this.left + x, 0, this.close + z, this.chunkMeshPool);
                     this.buffer[index] = newChunk;
                     this.loader.load(newChunk);
                 }

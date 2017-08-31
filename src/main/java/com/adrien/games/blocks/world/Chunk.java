@@ -26,9 +26,28 @@ public class Chunk {
     }
 
     public void load() {
-        this.blocks = this.initBlocks();
-        this.mesh.update(this);
-        this.loaded = true;
+        if (!this.loaded) {
+            this.blocks = this.initBlocks();
+            this.mesh.update(this);
+            this.loaded = true;
+        } else {
+            this.mesh.update(this);
+        }
+    }
+
+    public boolean addBlock(final int x, final int y, final int z, final BlockType type) {
+        if (!loaded) {
+            return false;
+        }
+        if (x < 0 || x >= World.CHUNK_WIDTH || y < 0 || y >= World.CHUNK_HEIGHT || z < 0 || z >= World.CHUNK_DEPTH) {
+            throw new IllegalArgumentException("Impossible to add block outside of chunk's bounds (" + x + ", " + y + ", " + z + ")");
+        }
+        final Block block = this.blocks[this.indexFromPosition(x, y, z)];
+        if (type.equals(block.getType()) || !(BlockType.AIR.equals(block.getType()) || BlockType.AIR.equals(type))) {
+            return false;
+        }
+        block.setType(type);
+        return true;
     }
 
     private Block[] initBlocks() {
@@ -73,18 +92,6 @@ public class Chunk {
     @Override
     public String toString() {
         return "Chunk{x=" + x + ", y=" + y + ", z=" + z + "}";
-    }
-
-    public int getX() {
-        return x;
-    }
-
-    public int getY() {
-        return y;
-    }
-
-    public int getZ() {
-        return z;
     }
 
     public Stream<Block> getBlocks() {
