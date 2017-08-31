@@ -36,14 +36,14 @@ public class Chunk {
     }
 
     public boolean addBlock(final int x, final int y, final int z, final BlockType type) {
-        if (!loaded) {
+        if (!this.loaded) {
             return false;
         }
         if (x < 0 || x >= World.CHUNK_WIDTH || y < 0 || y >= World.CHUNK_HEIGHT || z < 0 || z >= World.CHUNK_DEPTH) {
             throw new IllegalArgumentException("Impossible to add block outside of chunk's bounds (" + x + ", " + y + ", " + z + ")");
         }
         final Block block = this.blocks[this.indexFromPosition(x, y, z)];
-        if (type.equals(block.getType()) || !(BlockType.AIR.equals(block.getType()) || BlockType.AIR.equals(type))) {
+        if (type.equals(block.getType()) || !(block.isAir() || BlockType.AIR.equals(type))) {
             return false;
         }
         block.setType(type);
