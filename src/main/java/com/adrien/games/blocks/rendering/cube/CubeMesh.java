@@ -1,34 +1,54 @@
 package com.adrien.games.blocks.rendering.cube;
 
-import com.adrien.games.bagl.core.math.Vector3;
-import com.adrien.games.bagl.rendering.BufferUsage;
-import com.adrien.games.bagl.rendering.IndexBuffer;
-import com.adrien.games.bagl.rendering.VertexBuffer;
-import com.adrien.games.bagl.rendering.vertex.VertexPosition;
+import org.lwjgl.BufferUtils;
+import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL15;
+import org.lwjgl.opengl.GL20;
+import org.lwjgl.opengl.GL30;
+
+import java.nio.ByteBuffer;
 
 public class CubeMesh {
 
     public static final int INDEX_COUNT = 36;
-    private static final float POS = 1f;
-    private static final float NEG = 0f;
+    private static final byte POS = 1;
+    private static final byte NEG = 0;
 
-    private final VertexBuffer vertexBuffer;
-    private final IndexBuffer indexBuffer;
+    private final int vao;
+    private final int vbo;
+    private final int ibo;
 
     public CubeMesh() {
-        final VertexPosition[] vertices = new VertexPosition[]{
-                new VertexPosition(new Vector3(NEG, NEG, POS)),
-                new VertexPosition(new Vector3(POS, NEG, POS)),
-                new VertexPosition(new Vector3(NEG, POS, POS)),
-                new VertexPosition(new Vector3(POS, POS, POS)),
-                new VertexPosition(new Vector3(POS, NEG, NEG)),
-                new VertexPosition(new Vector3(NEG, NEG, NEG)),
-                new VertexPosition(new Vector3(POS, POS, NEG)),
-                new VertexPosition(new Vector3(NEG, POS, NEG))
-        };
-        this.vertexBuffer = new VertexBuffer(VertexPosition.DESCRIPTION, BufferUsage.STATIC_DRAW, vertices);
+        this.vao = GL30.glGenVertexArrays();
+        this.vbo = GL15.glGenBuffers();
+        this.initVertices();
 
-        final int[] indices = new int[]{
+        this.ibo = GL15.glGenBuffers();
+        this.initIndices();
+    }
+
+    private void initVertices() {
+        final byte[] positions = new byte[]{
+                NEG, NEG, POS,
+                POS, NEG, POS,
+                NEG, POS, POS,
+                POS, POS, POS,
+                POS, NEG, NEG,
+                NEG, NEG, NEG,
+                POS, POS, NEG,
+                NEG, POS, NEG
+        };
+        GL30.glBindVertexArray(this.vao);
+        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, this.vbo);
+        GL15.glBufferData(GL15.GL_ARRAY_BUFFER, this.bufferFromArray(positions), GL15.GL_STATIC_DRAW);
+        GL20.glEnableVertexAttribArray(0);
+        GL30.glVertexAttribIPointer(0, 3, GL11.GL_BYTE, 3, 0);
+        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
+        GL30.glBindVertexArray(0);
+    }
+
+    private void initIndices() {
+        final byte[] indices = new byte[]{
                 0, 1, 2, 2, 1, 3,
                 1, 4, 3, 3, 4, 6,
                 4, 5, 6, 6, 5, 7,
@@ -36,20 +56,32 @@ public class CubeMesh {
                 2, 3, 7, 7, 3, 6,
                 5, 4, 0, 0, 4, 1
         };
-        this.indexBuffer = new IndexBuffer(BufferUsage.STATIC_DRAW, indices);
+        GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, this.ibo);
+        GL15.glBufferData(GL15.GL_ELEMENT_ARRAY_BUFFER, this.bufferFromArray(indices), GL15.GL_STATIC_DRAW);
+        GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, 0);
+    }
+
+    private ByteBuffer bufferFromArray(final byte[] array) {
+        final ByteBuffer buffer = BufferUtils.createByteBuffer(array.length);
+        buffer.put(array);
+        buffer.flip();
+        return buffer;
     }
 
     public void destroy() {
-        this.indexBuffer.destroy();
-        this.vertexBuffer.destroy();
+        GL15.glDeleteBuffers(this.ibo);
+        GL15.glDeleteBuffers(this.vbo);
+        GL30.glDeleteVertexArrays(this.vao);
     }
 
-    public VertexBuffer getVertexBuffer() {
-        return this.vertexBuffer;
+    public void bind() {
+        GL30.glBindVertexArray(this.vao);
+        GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, this.ibo);
     }
 
-    public IndexBuffer getIndexBuffer() {
-        return this.indexBuffer;
+    public void unbind() {
+        GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, 0);
+        GL30.glBindVertexArray(0);
     }
 
 }
