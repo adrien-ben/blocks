@@ -1,5 +1,6 @@
 package com.adrien.games.blocks.rendering.chunk;
 
+import com.adrien.games.blocks.utils.Timer;
 import com.adrien.games.blocks.world.Chunk;
 import com.adrien.games.blocks.world.World;
 import com.adrien.games.blocks.world.block.Block;
@@ -93,6 +94,8 @@ public class ChunkMesh {
             return;
         }
 
+        final Timer timer = new Timer();
+
         LOG.trace("Uploading mesh data to GPU");
         GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, this.pbo);
         GL15.glBufferSubData(GL15.GL_ARRAY_BUFFER, 0, this.positions);
@@ -101,6 +104,8 @@ public class ChunkMesh {
         GL15.glBufferSubData(GL15.GL_ARRAY_BUFFER, 0, this.coordinates);
 
         GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
+
+        LOG.debug("Time to upload chuck : {}", timer.top());
         this.uploaded = true;
     }
 
