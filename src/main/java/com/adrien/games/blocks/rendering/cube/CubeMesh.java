@@ -1,10 +1,10 @@
 package com.adrien.games.blocks.rendering.cube;
 
-import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL15;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
+import org.lwjgl.system.MemoryUtil;
 
 import java.nio.ByteBuffer;
 
@@ -62,7 +62,7 @@ public class CubeMesh {
     }
 
     private ByteBuffer bufferFromArray(final byte[] array) {
-        final ByteBuffer buffer = BufferUtils.createByteBuffer(array.length);
+        final ByteBuffer buffer = MemoryUtil.memAlloc(array.length);
         buffer.put(array);
         buffer.flip();
         return buffer;
