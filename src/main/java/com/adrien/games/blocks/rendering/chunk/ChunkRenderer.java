@@ -4,22 +4,16 @@ import com.adrien.games.bagl.core.Camera;
 import com.adrien.games.bagl.rendering.BufferUsage;
 import com.adrien.games.bagl.rendering.IndexBuffer;
 import com.adrien.games.bagl.rendering.Shader;
-import com.adrien.games.bagl.rendering.texture.Filter;
 import com.adrien.games.bagl.rendering.texture.Texture;
-import com.adrien.games.bagl.rendering.texture.TextureParameters;
-import com.adrien.games.bagl.utils.FileUtils;
 import org.lwjgl.opengl.GL11;
 
 public class ChunkRenderer {
 
     private final Shader shader;
-    private final Texture blockAtlas;
     private final IndexBuffer indexBuffer;
 
     public ChunkRenderer() {
         this.shader = new Shader().addVertexShader("chunk.vert").addFragmentShader("chunk.frag").compile();
-        this.blockAtlas = new Texture(FileUtils.getResourceAbsolutePath("/textures/blocks.png"),
-                new TextureParameters().minFilter(Filter.NEAREST).magFilter(Filter.NEAREST));
         this.indexBuffer = new IndexBuffer(BufferUsage.STATIC_DRAW, ChunkMesh.MAX_INDEX_COUNT);
         this.generateIndices();
     }
@@ -37,11 +31,11 @@ public class ChunkRenderer {
         this.indexBuffer.setData(indices);
     }
 
-    public void renderChunk(final ChunkMesh mesh, final Camera camera) {
+    public void renderChunk(final ChunkMesh mesh, final Camera camera, final Texture texture) {
         mesh.uploadMesh();
         mesh.bind();
         this.indexBuffer.bind();
-        this.blockAtlas.bind();
+        texture.bind();
         this.shader.bind();
         this.shader.setUniform("uVP", camera.getViewProj());
         GL11.glDrawElements(GL11.GL_TRIANGLES, mesh.getFaceCount() * ChunkMesh.INDICES_PER_FACE, GL11.GL_UNSIGNED_INT, 0);
@@ -53,7 +47,6 @@ public class ChunkRenderer {
 
     public void destroy() {
         this.shader.destroy();
-        this.blockAtlas.destroy();
         this.indexBuffer.destroy();
     }
 

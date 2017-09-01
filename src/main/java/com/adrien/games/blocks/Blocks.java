@@ -1,16 +1,12 @@
 package com.adrien.games.blocks;
 
-import com.adrien.games.bagl.core.Camera;
-import com.adrien.games.bagl.core.CameraController;
-import com.adrien.games.bagl.core.Color;
-import com.adrien.games.bagl.core.Configuration;
-import com.adrien.games.bagl.core.Engine;
-import com.adrien.games.bagl.core.Game;
-import com.adrien.games.bagl.core.Input;
-import com.adrien.games.bagl.core.MouseMode;
-import com.adrien.games.bagl.core.Time;
+import com.adrien.games.bagl.core.*;
 import com.adrien.games.bagl.core.math.Vector3;
 import com.adrien.games.bagl.rendering.BlendMode;
+import com.adrien.games.bagl.rendering.texture.Filter;
+import com.adrien.games.bagl.rendering.texture.Texture;
+import com.adrien.games.bagl.rendering.texture.TextureParameters;
+import com.adrien.games.bagl.utils.FileUtils;
 import com.adrien.games.blocks.rendering.chunk.ChunkRenderer;
 import com.adrien.games.blocks.rendering.cube.CubeMesh;
 import com.adrien.games.blocks.rendering.cube.CubeRenderer;
@@ -25,6 +21,7 @@ import java.util.Optional;
 
 public class Blocks implements Game {
 
+    private Texture texture;
     private Camera camera;
     private CameraController cameraController;
 
@@ -45,7 +42,9 @@ public class Blocks implements Game {
         GL11.glEnable(GL11.GL_CULL_FACE);
 
         final Configuration conf = Configuration.getInstance();
-        this.camera = new Camera(new Vector3(0f, World.WORLD_MAX_HEIGHT * World.CHUNK_HEIGHT + 1, 0f), new Vector3(0, 0, 1), new Vector3(0, 1, 0),
+        this.texture = new Texture(FileUtils.getResourceAbsolutePath("/textures/blocks.png"),
+                new TextureParameters().minFilter(Filter.NEAREST).magFilter(Filter.NEAREST));
+        this.camera = new Camera(new Vector3(5.5f, World.WORLD_MAX_HEIGHT * World.CHUNK_HEIGHT + 1, 5.5f), new Vector3(0, 0, 1), new Vector3(0, 1, 0),
                 (float) Math.toRadians(70f), (float) conf.getXResolution() / conf.getYResolution(), 0.1f, 100f);
         this.cameraController = new CameraController(this.camera);
 
@@ -58,6 +57,7 @@ public class Blocks implements Game {
 
     @Override
     public void destroy() {
+        this.texture.destroy();
         this.world.destroy();
         this.chunkRenderer.destroy();
         this.cubeMesh.destroy();
@@ -82,8 +82,7 @@ public class Blocks implements Game {
 
     @Override
     public void render() {
-        this.world.getChunks().map(Chunk::getMesh).forEach(chunkMesh -> this.chunkRenderer.renderChunk(chunkMesh, this.camera));
-
+        this.world.getChunks().map(Chunk::getMesh).forEach(chunkMesh -> this.chunkRenderer.renderChunk(chunkMesh, this.camera, this.texture));
         if (Objects.nonNull(this.pointedBlock)) {
             GL11.glDepthFunc(GL11.GL_LEQUAL);
             Engine.setBlendMode(BlendMode.TRANSPARENCY);
