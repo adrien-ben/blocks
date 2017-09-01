@@ -208,6 +208,8 @@ public class ChunkMesh {
         GL15.glDeleteBuffers(this.pbo);
         GL15.glDeleteBuffers(this.cbo);
         GL30.glDeleteVertexArrays(this.vao);
+        MemoryUtil.memFree(this.positions);
+        MemoryUtil.memFree(this.coordinates);
     }
 
     public void bind() {

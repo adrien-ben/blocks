@@ -38,13 +38,15 @@ public class CubeMesh {
                 POS, POS, NEG,
                 NEG, POS, NEG
         };
+        final ByteBuffer buffer = this.bufferFromArray(positions);
         GL30.glBindVertexArray(this.vao);
         GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, this.vbo);
-        GL15.glBufferData(GL15.GL_ARRAY_BUFFER, this.bufferFromArray(positions), GL15.GL_STATIC_DRAW);
+        GL15.glBufferData(GL15.GL_ARRAY_BUFFER, buffer, GL15.GL_STATIC_DRAW);
         GL20.glEnableVertexAttribArray(0);
         GL30.glVertexAttribIPointer(0, 3, GL11.GL_BYTE, 3, 0);
         GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
         GL30.glBindVertexArray(0);
+        MemoryUtil.memFree(buffer);
     }
 
     private void initIndices() {
@@ -56,9 +58,11 @@ public class CubeMesh {
                 2, 3, 7, 7, 3, 6,
                 5, 4, 0, 0, 4, 1
         };
+        final ByteBuffer buffer = this.bufferFromArray(indices);
         GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, this.ibo);
-        GL15.glBufferData(GL15.GL_ELEMENT_ARRAY_BUFFER, this.bufferFromArray(indices), GL15.GL_STATIC_DRAW);
+        GL15.glBufferData(GL15.GL_ELEMENT_ARRAY_BUFFER, buffer, GL15.GL_STATIC_DRAW);
         GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, 0);
+        MemoryUtil.memFree(buffer);
     }
 
     private ByteBuffer bufferFromArray(final byte[] array) {
