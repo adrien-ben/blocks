@@ -8,7 +8,7 @@ out vec2 passTexCoords;
 uniform mat4 uVP;
 
 void main() {
-    passTexCoords = vTexCoords;
+    passTexCoords = vTexCoords*0.5 + 0.5;
     gl_Position = uVP*vPosition;
 }
 

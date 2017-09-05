@@ -7,41 +7,47 @@ public enum BlockType {
     STONE(1, 0),
     GRASS(2, 0);
 
-    private final float leftUV;
-    private final float topUV;
-    private final float rightUV;
-    private final float bottomUV;
+    private final byte leftUV;
+    private final byte bottomUV;
+    private final byte rightUV;
+    private final byte topUV;
 
     BlockType(final int xPosition, final int yPosition) {
-        this.leftUV = (float) xPosition / Constants.ATLAS_WIDTH + Constants.HALF_PIXEL_X;
-        this.bottomUV = (float) yPosition / Constants.ATLAS_HEIGHT + Constants.HALF_PIXEL_Y;
-        this.rightUV = (float) (xPosition + 1) / Constants.ATLAS_WIDTH - Constants.HALF_PIXEL_X;
-        this.topUV = (float) (yPosition + 1) / Constants.ATLAS_HEIGHT - Constants.HALF_PIXEL_Y;
+        this.leftUV = this.normalizeValue((float) xPosition / Constants.REGIONS_PER_ROW + Constants.HALF_PIXEL_X);
+        this.bottomUV = this.normalizeValue((float) yPosition / Constants.REGIONS_PER_COLUMN + Constants.HALF_PIXEL_Y);
+        this.rightUV = this.normalizeValue((float) (xPosition + 1) / Constants.REGIONS_PER_ROW - Constants.HALF_PIXEL_X);
+        this.topUV = this.normalizeValue((float) (yPosition + 1) / Constants.REGIONS_PER_COLUMN - Constants.HALF_PIXEL_Y);
     }
 
-    public float getLeftUV() {
+    private byte normalizeValue(final float value) {
+        return (byte) (value * 256 - 128);
+    }
+
+    public byte getLeftUV() {
         return leftUV;
     }
 
-    public float getTopUV() {
+    public byte getTopUV() {
         return topUV;
     }
 
-    public float getRightUV() {
+    public byte getRightUV() {
         return rightUV;
     }
 
-    public float getBottomUV() {
+    public byte getBottomUV() {
         return bottomUV;
     }
 
     private static final class Constants {
         private static final int NONE = -1;
-        private static final float REGION_SIZE = 32f;
-        private static final int ATLAS_WIDTH = 3;
-        private static final int ATLAS_HEIGHT = 1;
-        private static final float HALF_PIXEL_X = 1f / REGION_SIZE * ATLAS_WIDTH;
-        private static final float HALF_PIXEL_Y = 1f / REGION_SIZE * ATLAS_HEIGHT;
+        private static final int REGIONS_PER_ROW = 3;
+        private static final int REGIONS_PER_COLUMN = 1;
+        private static final int REGION_SIZE_IN_PIXELS = 32;
+        private static final int ATLAS_WIDTH_IN_PIXELS = REGIONS_PER_ROW * REGION_SIZE_IN_PIXELS;
+        private static final int ATLAS_HEIGHT_IN_PIXELS = REGIONS_PER_COLUMN * REGION_SIZE_IN_PIXELS;
+        private static final float HALF_PIXEL_X = 0.5f / ATLAS_WIDTH_IN_PIXELS;
+        private static final float HALF_PIXEL_Y = 0.5f / ATLAS_HEIGHT_IN_PIXELS;
     }
 
 }
