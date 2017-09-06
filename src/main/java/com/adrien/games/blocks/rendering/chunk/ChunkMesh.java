@@ -22,18 +22,28 @@ public class ChunkMesh {
 
     private static final int MAX_FACE_PER_BLOCK = 6;
     public static final int VERTICES_PER_FACE = 4;
-    private static final int ELEMENT_PER_POSITION = 3;
-    private static final int ELEMENT_PER_COORDINATES = 2;
-    private static final int BYTE_SIZE_IN_BYTES = Byte.SIZE / 8;
-    private static final int SHORT_SIZE_IN_BYTES = Short.SIZE / 8;
     public static final int INDICES_PER_FACE = 6;
     private static final int MAX_VISIBLE_BLOCK_PER_CHUNK = World.BLOCK_PER_CHUNK / 2 + 1;
     public static final int MAX_FACE_COUNT = MAX_VISIBLE_BLOCK_PER_CHUNK * MAX_FACE_PER_BLOCK;
-    private static final int MAX_VERTEX_COUNT = MAX_FACE_COUNT * VERTICES_PER_FACE;
     public static final int MAX_INDEX_COUNT = MAX_FACE_COUNT * INDICES_PER_FACE;
+    private static final int MAX_VERTEX_COUNT = MAX_FACE_COUNT * VERTICES_PER_FACE;
+
+    private static final int ELEMENT_PER_POSITION = 3;
+    private static final int ELEMENT_PER_COORDINATES = 2;
+    private static final int ELEMENT_PER_NORMALS = 1;
+    private static final int ELEMENT_PER_COORDINATES_PLUS_NORMALS = ELEMENT_PER_COORDINATES + ELEMENT_PER_NORMALS;
+    private static final int BYTE_SIZE_IN_BYTES = Byte.SIZE / 8;
+    private static final int SHORT_SIZE_IN_BYTES = Short.SIZE / 8;
+
+    private static final byte FRONT_FACE_NORMAL_INDEX = 0;
+    private static final byte RIGHT_FACE_NORMAL_INDEX = 1;
+    private static final byte BACK_FACE_NORMAL_INDEX = 2;
+    private static final byte LEFT_FACE_NORMAL_INDEX = 3;
+    private static final byte TOP_FACE_NORMAL_INDEX = 4;
+    private static final byte BOTTOM_FACE_NORMAL_INDEX = 5;
 
     private final ShortBuffer positions;
-    private final ByteBuffer coordinates;
+    private final ByteBuffer coordinatesAndNormals;
 
     private int vao;
     private int pbo;
@@ -47,7 +57,7 @@ public class ChunkMesh {
         LOG.trace("Initializing OpenGL buffers for chunk mesh");
 
         this.positions = MemoryUtil.memAllocShort(MAX_VERTEX_COUNT * ELEMENT_PER_POSITION);
-        this.coordinates = MemoryUtil.memAlloc(MAX_VERTEX_COUNT * ELEMENT_PER_COORDINATES);
+        this.coordinatesAndNormals = MemoryUtil.memAlloc(MAX_VERTEX_COUNT * ELEMENT_PER_COORDINATES_PLUS_NORMALS);
 
         this.vao = GL30.glGenVertexArrays();
         GL30.glBindVertexArray(this.vao);
@@ -61,10 +71,15 @@ public class ChunkMesh {
 
         this.cbo = GL15.glGenBuffers();
         GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, this.cbo);
-        GL15.glBufferData(GL15.GL_ARRAY_BUFFER, this.coordinates, GL15.GL_DYNAMIC_DRAW);
+        GL15.glBufferData(GL15.GL_ARRAY_BUFFER, this.coordinatesAndNormals, GL15.GL_DYNAMIC_DRAW);
 
         GL20.glEnableVertexAttribArray(1);
-        GL20.glVertexAttribPointer(1, ELEMENT_PER_COORDINATES, GL11.GL_BYTE, true, ELEMENT_PER_COORDINATES * BYTE_SIZE_IN_BYTES, 0);
+        GL20.glVertexAttribPointer(1, ELEMENT_PER_COORDINATES, GL11.GL_BYTE, true,
+                ELEMENT_PER_COORDINATES_PLUS_NORMALS * BYTE_SIZE_IN_BYTES, 0);
+
+        GL20.glEnableVertexAttribArray(2);
+        GL30.glVertexAttribIPointer(2, ELEMENT_PER_COORDINATES, GL11.GL_BYTE, ELEMENT_PER_COORDINATES_PLUS_NORMALS * BYTE_SIZE_IN_BYTES,
+                ELEMENT_PER_COORDINATES * BYTE_SIZE_IN_BYTES);
 
         GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
         GL30.glBindVertexArray(0);
@@ -84,7 +99,7 @@ public class ChunkMesh {
         LOG.trace("Updating mesh for chunk {}", chunk);
         this.faceCount = 0;
         this.positions.limit(MAX_VERTEX_COUNT * ELEMENT_PER_POSITION);
-        this.coordinates.limit(MAX_VERTEX_COUNT * ELEMENT_PER_COORDINATES);
+        this.coordinatesAndNormals.limit(MAX_VERTEX_COUNT * ELEMENT_PER_COORDINATES_PLUS_NORMALS);
         chunk.getBlocks()
                 .filter(Block::isNotAir)
                 .forEach(block -> this.computeBlockFaces(chunk, block));
@@ -108,9 +123,9 @@ public class ChunkMesh {
         GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, this.pbo);
         GL15.glBufferSubData(GL15.GL_ARRAY_BUFFER, 0, this.positions);
 
-        this.coordinates.limit(this.faceCount * VERTICES_PER_FACE * ELEMENT_PER_COORDINATES);
+        this.coordinatesAndNormals.limit(this.faceCount * VERTICES_PER_FACE * ELEMENT_PER_COORDINATES_PLUS_NORMALS);
         GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, this.cbo);
-        GL15.glBufferSubData(GL15.GL_ARRAY_BUFFER, 0, this.coordinates);
+        GL15.glBufferSubData(GL15.GL_ARRAY_BUFFER, 0, this.coordinatesAndNormals);
 
         GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
 
@@ -153,53 +168,54 @@ public class ChunkMesh {
     }
 
     private void addLeftFace(final int x, final int y, final int z, final BlockType type) {
-        this.setVertexValues(this.faceCount * VERTICES_PER_FACE, x, y, z, type.getLeftUV(), type.getBottomUV());
-        this.setVertexValues(this.faceCount * VERTICES_PER_FACE + 1, x, y, z + 1, type.getRightUV(), type.getBottomUV());
-        this.setVertexValues(this.faceCount * VERTICES_PER_FACE + 2, x, y + 1, z, type.getLeftUV(), type.getTopUV());
-        this.setVertexValues(this.faceCount * VERTICES_PER_FACE + 3, x, y + 1, z + 1, type.getRightUV(), type.getTopUV());
+        this.setVertexValues(this.faceCount * VERTICES_PER_FACE, x, y, z, type.getLeftUV(), type.getBottomUV(), LEFT_FACE_NORMAL_INDEX);
+        this.setVertexValues(this.faceCount * VERTICES_PER_FACE + 1, x, y, z + 1, type.getRightUV(), type.getBottomUV(), LEFT_FACE_NORMAL_INDEX);
+        this.setVertexValues(this.faceCount * VERTICES_PER_FACE + 2, x, y + 1, z, type.getLeftUV(), type.getTopUV(), LEFT_FACE_NORMAL_INDEX);
+        this.setVertexValues(this.faceCount * VERTICES_PER_FACE + 3, x, y + 1, z + 1, type.getRightUV(), type.getTopUV(), LEFT_FACE_NORMAL_INDEX);
     }
 
     private void addRightFace(final int x, final int y, final int z, final BlockType type) {
-        this.setVertexValues(this.faceCount * VERTICES_PER_FACE, x + 1, y, z + 1, type.getLeftUV(), type.getBottomUV());
-        this.setVertexValues(this.faceCount * VERTICES_PER_FACE + 1, x + 1, y, z, type.getRightUV(), type.getBottomUV());
-        this.setVertexValues(this.faceCount * VERTICES_PER_FACE + 2, x + 1, y + 1, z + 1, type.getLeftUV(), type.getTopUV());
-        this.setVertexValues(this.faceCount * VERTICES_PER_FACE + 3, x + 1, y + 1, z, type.getRightUV(), type.getTopUV());
+        this.setVertexValues(this.faceCount * VERTICES_PER_FACE, x + 1, y, z + 1, type.getLeftUV(), type.getBottomUV(), RIGHT_FACE_NORMAL_INDEX);
+        this.setVertexValues(this.faceCount * VERTICES_PER_FACE + 1, x + 1, y, z, type.getRightUV(), type.getBottomUV(), RIGHT_FACE_NORMAL_INDEX);
+        this.setVertexValues(this.faceCount * VERTICES_PER_FACE + 2, x + 1, y + 1, z + 1, type.getLeftUV(), type.getTopUV(), RIGHT_FACE_NORMAL_INDEX);
+        this.setVertexValues(this.faceCount * VERTICES_PER_FACE + 3, x + 1, y + 1, z, type.getRightUV(), type.getTopUV(), RIGHT_FACE_NORMAL_INDEX);
     }
 
     private void addBottomFace(final int x, final int y, final int z, final BlockType type) {
-        this.setVertexValues(this.faceCount * VERTICES_PER_FACE, x, y, z, type.getLeftUV(), type.getBottomUV());
-        this.setVertexValues(this.faceCount * VERTICES_PER_FACE + 1, x + 1, y, z, type.getRightUV(), type.getBottomUV());
-        this.setVertexValues(this.faceCount * VERTICES_PER_FACE + 2, x, y, z + 1, type.getLeftUV(), type.getTopUV());
-        this.setVertexValues(this.faceCount * VERTICES_PER_FACE + 3, x + 1, y, z + 1, type.getRightUV(), type.getTopUV());
+        this.setVertexValues(this.faceCount * VERTICES_PER_FACE, x, y, z, type.getLeftUV(), type.getBottomUV(), BOTTOM_FACE_NORMAL_INDEX);
+        this.setVertexValues(this.faceCount * VERTICES_PER_FACE + 1, x + 1, y, z, type.getRightUV(), type.getBottomUV(), BOTTOM_FACE_NORMAL_INDEX);
+        this.setVertexValues(this.faceCount * VERTICES_PER_FACE + 2, x, y, z + 1, type.getLeftUV(), type.getTopUV(), BOTTOM_FACE_NORMAL_INDEX);
+        this.setVertexValues(this.faceCount * VERTICES_PER_FACE + 3, x + 1, y, z + 1, type.getRightUV(), type.getTopUV(), BOTTOM_FACE_NORMAL_INDEX);
     }
 
     private void addTopFace(final int x, final int y, final int z, final BlockType type) {
-        this.setVertexValues(this.faceCount * VERTICES_PER_FACE, x, y + 1, z + 1, type.getLeftUV(), type.getBottomUV());
-        this.setVertexValues(this.faceCount * VERTICES_PER_FACE + 1, x + 1, y + 1, z + 1, type.getRightUV(), type.getBottomUV());
-        this.setVertexValues(this.faceCount * VERTICES_PER_FACE + 2, x, y + 1, z, type.getLeftUV(), type.getTopUV());
-        this.setVertexValues(this.faceCount * VERTICES_PER_FACE + 3, x + 1, y + 1, z, type.getRightUV(), type.getTopUV());
+        this.setVertexValues(this.faceCount * VERTICES_PER_FACE, x, y + 1, z + 1, type.getLeftUV(), type.getBottomUV(), TOP_FACE_NORMAL_INDEX);
+        this.setVertexValues(this.faceCount * VERTICES_PER_FACE + 1, x + 1, y + 1, z + 1, type.getRightUV(), type.getBottomUV(), TOP_FACE_NORMAL_INDEX);
+        this.setVertexValues(this.faceCount * VERTICES_PER_FACE + 2, x, y + 1, z, type.getLeftUV(), type.getTopUV(), TOP_FACE_NORMAL_INDEX);
+        this.setVertexValues(this.faceCount * VERTICES_PER_FACE + 3, x + 1, y + 1, z, type.getRightUV(), type.getTopUV(), TOP_FACE_NORMAL_INDEX);
     }
 
     private void addBackFace(final int x, final int y, final int z, final BlockType type) {
-        this.setVertexValues(this.faceCount * VERTICES_PER_FACE, x + 1, y, z, type.getLeftUV(), type.getBottomUV());
-        this.setVertexValues(this.faceCount * VERTICES_PER_FACE + 1, x, y, z, type.getRightUV(), type.getBottomUV());
-        this.setVertexValues(this.faceCount * VERTICES_PER_FACE + 2, x + 1, y + 1, z, type.getLeftUV(), type.getTopUV());
-        this.setVertexValues(this.faceCount * VERTICES_PER_FACE + 3, x, y + 1, z, type.getRightUV(), type.getTopUV());
+        this.setVertexValues(this.faceCount * VERTICES_PER_FACE, x + 1, y, z, type.getLeftUV(), type.getBottomUV(), BACK_FACE_NORMAL_INDEX);
+        this.setVertexValues(this.faceCount * VERTICES_PER_FACE + 1, x, y, z, type.getRightUV(), type.getBottomUV(), BACK_FACE_NORMAL_INDEX);
+        this.setVertexValues(this.faceCount * VERTICES_PER_FACE + 2, x + 1, y + 1, z, type.getLeftUV(), type.getTopUV(), BACK_FACE_NORMAL_INDEX);
+        this.setVertexValues(this.faceCount * VERTICES_PER_FACE + 3, x, y + 1, z, type.getRightUV(), type.getTopUV(), BACK_FACE_NORMAL_INDEX);
     }
 
     private void addFrontFace(final int x, final int y, final int z, final BlockType type) {
-        this.setVertexValues(this.faceCount * VERTICES_PER_FACE, x, y, z + 1, type.getLeftUV(), type.getBottomUV());
-        this.setVertexValues(this.faceCount * VERTICES_PER_FACE + 1, x + 1, y, z + 1, type.getRightUV(), type.getBottomUV());
-        this.setVertexValues(this.faceCount * VERTICES_PER_FACE + 2, x, y + 1, z + 1, type.getLeftUV(), type.getTopUV());
-        this.setVertexValues(this.faceCount * VERTICES_PER_FACE + 3, x + 1, y + 1, z + 1, type.getRightUV(), type.getTopUV());
+        this.setVertexValues(this.faceCount * VERTICES_PER_FACE, x, y, z + 1, type.getLeftUV(), type.getBottomUV(), FRONT_FACE_NORMAL_INDEX);
+        this.setVertexValues(this.faceCount * VERTICES_PER_FACE + 1, x + 1, y, z + 1, type.getRightUV(), type.getBottomUV(), FRONT_FACE_NORMAL_INDEX);
+        this.setVertexValues(this.faceCount * VERTICES_PER_FACE + 2, x, y + 1, z + 1, type.getLeftUV(), type.getTopUV(), FRONT_FACE_NORMAL_INDEX);
+        this.setVertexValues(this.faceCount * VERTICES_PER_FACE + 3, x + 1, y + 1, z + 1, type.getRightUV(), type.getTopUV(), FRONT_FACE_NORMAL_INDEX);
     }
 
-    private void setVertexValues(final int index, final int x, final int y, final int z, final byte u, final byte v) {
+    private void setVertexValues(final int index, final int x, final int y, final int z, final byte u, final byte v, final byte normalIndex) {
         this.positions.put(index * ELEMENT_PER_POSITION, (short) x);
         this.positions.put(index * ELEMENT_PER_POSITION + 1, (short) y);
         this.positions.put(index * ELEMENT_PER_POSITION + 2, (short) z);
-        this.coordinates.put(index * ELEMENT_PER_COORDINATES, u);
-        this.coordinates.put(index * ELEMENT_PER_COORDINATES + 1, v);
+        this.coordinatesAndNormals.put(index * ELEMENT_PER_COORDINATES_PLUS_NORMALS, u);
+        this.coordinatesAndNormals.put(index * ELEMENT_PER_COORDINATES_PLUS_NORMALS + 1, v);
+        this.coordinatesAndNormals.put(index * ELEMENT_PER_COORDINATES_PLUS_NORMALS + 2, normalIndex);
     }
 
     public void destroy() {
@@ -209,7 +225,7 @@ public class ChunkMesh {
         GL15.glDeleteBuffers(this.cbo);
         GL30.glDeleteVertexArrays(this.vao);
         MemoryUtil.memFree(this.positions);
-        MemoryUtil.memFree(this.coordinates);
+        MemoryUtil.memFree(this.coordinatesAndNormals);
     }
 
     public void bind() {
