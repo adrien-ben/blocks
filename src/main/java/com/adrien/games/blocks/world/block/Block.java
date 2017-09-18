@@ -60,4 +60,12 @@ public class Block {
         return !this.isAir();
     }
 
+    public boolean isInvisible() {
+        return BlockType.AIR.equals(this.type) || BlockType.WATER.equals(this.type);
+    }
+
+    public boolean isVisible() {
+        return !isInvisible();
+    }
+
 }

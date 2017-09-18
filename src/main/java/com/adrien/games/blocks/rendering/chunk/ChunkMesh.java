@@ -101,7 +101,7 @@ public class ChunkMesh {
         this.positions.limit(MAX_VERTEX_COUNT * ELEMENT_PER_POSITION);
         this.coordinatesAndNormals.limit(MAX_VERTEX_COUNT * ELEMENT_PER_COORDINATES_PLUS_NORMALS);
         chunk.getBlocks()
-                .filter(Block::isNotAir)
+                .filter(Block::isVisible)
                 .forEach(block -> this.computeBlockFaces(chunk, block));
         this.uploaded = false;
         this.ready = true;
@@ -141,27 +141,27 @@ public class ChunkMesh {
         final int worldY = block.getWorldY();
         final int worldZ = block.getWorldZ();
         final BlockType type = block.getType();
-        if (indexX == 0 || chunk.getBlock(indexX - 1, indexY, indexZ).isAir()) {
+        if (indexX == 0 || chunk.getBlock(indexX - 1, indexY, indexZ).isInvisible()) {
             this.addLeftFace(worldX, worldY, worldZ, type);
             this.faceCount++;
         }
-        if (indexX == World.CHUNK_WIDTH - 1 || chunk.getBlock(indexX + 1, indexY, indexZ).isAir()) {
+        if (indexX == World.CHUNK_WIDTH - 1 || chunk.getBlock(indexX + 1, indexY, indexZ).isInvisible()) {
             this.addRightFace(worldX, worldY, worldZ, type);
             this.faceCount++;
         }
-        if (indexY == 0 || chunk.getBlock(indexX, indexY - 1, indexZ).isAir()) {
+        if (indexY == 0 || chunk.getBlock(indexX, indexY - 1, indexZ).isInvisible()) {
             this.addBottomFace(worldX, worldY, worldZ, type);
             this.faceCount++;
         }
-        if (indexY == World.CHUNK_HEIGHT - 1 || chunk.getBlock(indexX, indexY + 1, indexZ).isAir()) {
+        if (indexY == World.CHUNK_HEIGHT - 1 || chunk.getBlock(indexX, indexY + 1, indexZ).isInvisible()) {
             this.addTopFace(worldX, worldY, worldZ, type);
             this.faceCount++;
         }
-        if (indexZ == 0 || chunk.getBlock(indexX, indexY, indexZ - 1).isAir()) {
+        if (indexZ == 0 || chunk.getBlock(indexX, indexY, indexZ - 1).isInvisible()) {
             this.addBackFace(worldX, worldY, worldZ, type);
             this.faceCount++;
         }
-        if (indexZ == World.CHUNK_DEPTH - 1 || chunk.getBlock(indexX, indexY, indexZ + 1).isAir()) {
+        if (indexZ == World.CHUNK_DEPTH - 1 || chunk.getBlock(indexX, indexY, indexZ + 1).isInvisible()) {
             this.addFrontFace(worldX, worldY, worldZ, type);
             this.faceCount++;
         }
