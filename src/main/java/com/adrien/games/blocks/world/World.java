@@ -17,13 +17,14 @@ public class World {
 
     private static final Logger LOG = LogManager.getLogger(World.class);
 
-    public static final int WORLD_MAX_WIDTH = 4;
-    public static final int WORLD_MAX_DEPTH = 4;
+    public static final int WORLD_MAX_WIDTH = 10;
+    public static final int WORLD_MAX_DEPTH = 10;
     public static final int WORLD_MAX_HEIGHT = 1;
     public static final int CHUNK_WIDTH = 16;
-    public static final int CHUNK_HEIGHT = 16;
+    public static final int CHUNK_HEIGHT = 128;
     public static final int CHUNK_DEPTH = 16;
     public static final int BLOCK_PER_CHUNK = CHUNK_WIDTH * CHUNK_HEIGHT * CHUNK_DEPTH;
+    public static final int WATER_LEVEL = WORLD_MAX_HEIGHT * CHUNK_HEIGHT / 2;
 
     private final ChunkMeshPool chunkMeshPool;
     private Chunk[] chunks;
@@ -108,7 +109,7 @@ public class World {
         final Chunk chunk = this.chunks[this.indexFromPosition(chunkX - left, chunkZ - close)];
         final Block block = chunk.getBlock(x - chunkX * CHUNK_WIDTH, y - chunkY * CHUNK_HEIGHT, z - chunkZ * CHUNK_DEPTH);
 
-        if (Objects.nonNull(predicate) && !predicate.test(block)) {
+        if (Objects.isNull(block) || (Objects.nonNull(predicate) && !predicate.test(block))) {
             return Optional.empty();
         }
         return Optional.of(block);
