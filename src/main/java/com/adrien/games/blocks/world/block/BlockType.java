@@ -3,6 +3,7 @@ package com.adrien.games.blocks.world.block;
 public enum BlockType {
 
     AIR(Constants.NONE, Constants.NONE),
+    WATER(Constants.NONE, Constants.NONE),
     DIRT(0, 0),
     STONE(1, 0),
     GRASS(2, 0);
