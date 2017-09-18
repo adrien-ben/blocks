@@ -8,7 +8,7 @@ out vec4 finalColor;
 uniform sampler2D sampler;
 
 vec3 ambient = vec3(0.3, 0.3, 0.3);
-vec3 lightDirection = normalize(vec3(1.0, -1.0, 1.0));
+vec3 lightDirection = normalize(vec3(1.2, -0.8, 3.0));
 vec3 sunLight = vec3(0.8, 0.8, 0.8);
 
 void main() {
