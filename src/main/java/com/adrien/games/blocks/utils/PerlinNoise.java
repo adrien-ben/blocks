@@ -2,7 +2,7 @@ package com.adrien.games.blocks.utils;
 
 /**
  * Perlin Noise implementation. Not mine !
- *
+ * <p>
  * http://mrl.nyu.edu/~perlin/noise/
  * http://mrl.nyu.edu/~perlin/paper445.pdf
  */
@@ -30,7 +30,7 @@ public class PerlinNoise {
         }
     }
 
-    public double noise(double x, double y, double z, int octaves, double persistence) {
+    public static double noise(double x, double y, double z, int octaves, double persistence) {
         double total = 0;
         double frequency = 1;
         double amplitude = 1;
@@ -47,7 +47,7 @@ public class PerlinNoise {
         return total / maxValue;
     }
 
-    public double noise(double x, double y, double z) {
+    public static double noise(double x, double y, double z) {
         int X = (int) Math.floor(x) & 255;
         int Y = (int) Math.floor(y) & 255;
         int Z = (int) Math.floor(z) & 255;
@@ -70,18 +70,18 @@ public class PerlinNoise {
         return lerp(w, lerp(v, lerp(u, grad(P[AA], x, y, z), grad(P[BA], x - 1, y, z)), lerp(u, grad(P[AB], x, y - 1, z),
                 grad(P[BB], x - 1, y - 1, z))), lerp(v, lerp(u, grad(P[AA + 1], x, y, z - 1),
                 grad(P[BA + 1], x - 1, y, z - 1)), lerp(u, grad(P[AB + 1], x, y - 1, z - 1),
-                grad(P[BB + 1], x - 1, y - 1, z - 1))));
+                grad(P[BB + 1], x - 1, y - 1, z - 1)))) * 0.5 + 0.5;
     }
 
-    double fade(double t) {
+    private static double fade(double t) {
         return t * t * t * (t * (t * 6 - 15) + 10);
     }
 
-    double lerp(double t, double a, double b) {
+    private static double lerp(double t, double a, double b) {
         return a + t * (b - a);
     }
 
-    double grad(int hash, double x, double y, double z) {
+    private static double grad(int hash, double x, double y, double z) {
         int h = hash & 15;
         double u = h < 8 ? x : y;
         double v = h < 4 ? y : h == 12 || h == 14 ? x : z;
