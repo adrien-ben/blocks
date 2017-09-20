@@ -6,6 +6,9 @@ uniform mat4 uVP;
 uniform vec3 uOffset;
 uniform int uWaterLevel;
 
+out vec3 passPosition;
+
 void main() {
-    gl_Position = uVP*vec4(vPosition.x + uOffset.x, uWaterLevel - 0.1, vPosition.y + uOffset.z, 1.0);
+    passPosition = vec3(vPosition.x + uOffset.x, uWaterLevel - 0.1, vPosition.y + uOffset.z);
+    gl_Position = uVP*vec4(passPosition, 1.0);
 }
