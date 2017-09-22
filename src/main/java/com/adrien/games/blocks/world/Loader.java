@@ -34,7 +34,7 @@ public class Loader extends Thread {
         LOG.trace("Ended loader thread");
     }
 
-    private void takeANap(long ms) {
+    private void takeANap(final long ms) {
         try {
             Thread.sleep(ms);
         } catch (final InterruptedException exception) {

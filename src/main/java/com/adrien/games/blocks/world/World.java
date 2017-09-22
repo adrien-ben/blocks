@@ -5,6 +5,8 @@ import com.adrien.games.blocks.rendering.chunk.ChunkMeshPool;
 import com.adrien.games.blocks.utils.Point;
 import com.adrien.games.blocks.world.block.Block;
 import com.adrien.games.blocks.world.block.BlockType;
+import com.adrien.games.blocks.world.terrain.generator.NoiseTerrainGenerator;
+import com.adrien.games.blocks.world.terrain.generator.TerrainGenerator;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -27,6 +29,7 @@ public class World {
     public static final int WATER_LEVEL = WORLD_MAX_HEIGHT * CHUNK_HEIGHT / 2;
 
     private final ChunkMeshPool chunkMeshPool;
+    private final TerrainGenerator generator;
     private Chunk[] chunks;
     private Chunk[] buffer;
     private final Point marker;
@@ -39,6 +42,7 @@ public class World {
 
     public World() {
         this.chunkMeshPool = new ChunkMeshPool(World.WORLD_MAX_WIDTH * World.WORLD_MAX_DEPTH * 2);
+        this.generator = new NoiseTerrainGenerator();
         this.chunks = new Chunk[WORLD_MAX_WIDTH * WORLD_MAX_DEPTH];
         this.buffer = new Chunk[WORLD_MAX_WIDTH * WORLD_MAX_DEPTH];
         this.marker = new Point();
@@ -141,7 +145,7 @@ public class World {
                 if (this.isInBound(oldX, oldZ) && Objects.nonNull(this.chunks[oldIndex])) {
                     this.buffer[index] = this.chunks[oldIndex];
                 } else {
-                    final Chunk newChunk = new Chunk(this.left + x, 0, this.close + z, this.chunkMeshPool);
+                    final Chunk newChunk = new Chunk(this.left + x, 0, this.close + z, this.chunkMeshPool, this.generator);
                     this.buffer[index] = newChunk;
                     this.loader.load(newChunk);
                 }
