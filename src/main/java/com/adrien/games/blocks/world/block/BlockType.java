@@ -6,7 +6,9 @@ public enum BlockType {
     WATER(Constants.NONE, Constants.NONE),
     DIRT(0, 0),
     STONE(1, 0),
-    GRASS(2, 0);
+    GRASS(2, 0),
+    SAND(3, 0),
+    SNOW(4, 0);
 
     private final byte leftUV;
     private final byte bottomUV;
@@ -42,7 +44,7 @@ public enum BlockType {
 
     private static final class Constants {
         private static final int NONE = -1;
-        private static final int REGIONS_PER_ROW = 3;
+        private static final int REGIONS_PER_ROW = 5;
         private static final int REGIONS_PER_COLUMN = 1;
         private static final int REGION_SIZE_IN_PIXELS = 32;
         private static final int ATLAS_WIDTH_IN_PIXELS = REGIONS_PER_ROW * REGION_SIZE_IN_PIXELS;
