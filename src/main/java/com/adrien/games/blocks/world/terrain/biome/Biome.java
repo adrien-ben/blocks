@@ -4,6 +4,6 @@ import com.adrien.games.blocks.world.block.BlockType;
 
 public interface Biome {
 
-    BlockType computeBlockType(int worldX, int worldY, int worldZ);
+    BlockType computeBlockType(int worldY, int maxHeight);
 
 }

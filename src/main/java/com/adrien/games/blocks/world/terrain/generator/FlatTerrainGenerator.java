@@ -8,8 +8,7 @@ import com.adrien.games.blocks.world.block.BlockType;
 public class FlatTerrainGenerator implements TerrainGenerator {
 
     @Override
-    public Block[] generatorChunkBlocks(int chunkX, int chunkY, int chunkZ) {
-        final Block[] blocks = new Block[World.BLOCK_PER_CHUNK];
+    public void generateChunkBlocks(final int chunkX, final int chunkY, final int chunkZ, final Block[] blocks) {
         for (int x = 0; x < World.CHUNK_WIDTH; x++) {
             for (int z = 0; z < World.CHUNK_DEPTH; z++) {
                 for (int y = 0; y < World.CHUNK_HEIGHT; y++) {
@@ -20,7 +19,6 @@ public class FlatTerrainGenerator implements TerrainGenerator {
                 }
             }
         }
-        return blocks;
     }
 
     private BlockType getBlockType(final int worldY) {

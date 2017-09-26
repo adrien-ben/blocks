@@ -31,7 +31,8 @@ public class Chunk {
 
     public void load() {
         if (!this.loaded) {
-            this.blocks = this.generator.generatorChunkBlocks(this.x, this.y, this.z);
+            this.blocks = new Block[World.BLOCK_PER_CHUNK];
+            this.generator.generateChunkBlocks(this.x, this.y, this.z, this.blocks);
             this.mesh.update(this);
             this.loaded = true;
         } else {

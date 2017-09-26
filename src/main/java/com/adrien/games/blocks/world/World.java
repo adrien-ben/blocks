@@ -5,7 +5,7 @@ import com.adrien.games.blocks.rendering.chunk.ChunkMeshPool;
 import com.adrien.games.blocks.utils.Point;
 import com.adrien.games.blocks.world.block.Block;
 import com.adrien.games.blocks.world.block.BlockType;
-import com.adrien.games.blocks.world.terrain.generator.NoiseTerrainGenerator;
+import com.adrien.games.blocks.world.terrain.generator.HeightMapTerrainGenerator;
 import com.adrien.games.blocks.world.terrain.generator.TerrainGenerator;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -21,12 +21,11 @@ public class World {
 
     public static final int WORLD_MAX_WIDTH = 10;
     public static final int WORLD_MAX_DEPTH = 10;
-    public static final int WORLD_MAX_HEIGHT = 1;
     public static final int CHUNK_WIDTH = 16;
     public static final int CHUNK_HEIGHT = 128;
     public static final int CHUNK_DEPTH = 16;
     public static final int BLOCK_PER_CHUNK = CHUNK_WIDTH * CHUNK_HEIGHT * CHUNK_DEPTH;
-    public static final int WATER_LEVEL = WORLD_MAX_HEIGHT * CHUNK_HEIGHT / 2;
+    public static final int WATER_LEVEL = CHUNK_HEIGHT / 2;
 
     private final ChunkMeshPool chunkMeshPool;
     private final TerrainGenerator generator;
@@ -42,7 +41,7 @@ public class World {
 
     public World() {
         this.chunkMeshPool = new ChunkMeshPool(World.WORLD_MAX_WIDTH * World.WORLD_MAX_DEPTH * 2);
-        this.generator = new NoiseTerrainGenerator();
+        this.generator = new HeightMapTerrainGenerator();
         this.chunks = new Chunk[WORLD_MAX_WIDTH * WORLD_MAX_DEPTH];
         this.buffer = new Chunk[WORLD_MAX_WIDTH * WORLD_MAX_DEPTH];
         this.marker = new Point();
