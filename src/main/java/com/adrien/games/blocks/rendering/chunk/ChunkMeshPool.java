@@ -6,15 +6,13 @@ import java.util.Stack;
 
 public class ChunkMeshPool {
 
-    private int size;
     private final Stack<ChunkMesh> pool;
     private final List<ChunkMesh> usedChunkMeshes;
 
     public ChunkMeshPool(final int size) {
-        this.size = size;
         this.pool = new Stack<>();
         this.usedChunkMeshes = new ArrayList<>();
-        for (int i = 0; i < this.size; i++) {
+        for (int i = 0; i < size; i++) {
             final ChunkMesh chunkMesh = new ChunkMesh();
             this.pool.push(chunkMesh);
         }
