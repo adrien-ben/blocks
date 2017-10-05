@@ -1,6 +1,8 @@
 package com.adrien.games.blocks.world;
 
+import com.adrien.games.bagl.core.Time;
 import com.adrien.games.bagl.core.math.Vector3;
+import com.adrien.games.blocks.player.Player;
 import com.adrien.games.blocks.rendering.chunk.ChunkMeshPool;
 import com.adrien.games.blocks.utils.Point;
 import com.adrien.games.blocks.world.block.Block;
@@ -19,8 +21,8 @@ public class World {
 
     private static final Logger LOG = LogManager.getLogger(World.class);
 
-    public static final int WORLD_MAX_WIDTH = 10;
-    public static final int WORLD_MAX_DEPTH = 10;
+    private static final int WORLD_MAX_WIDTH = 10;
+    private static final int WORLD_MAX_DEPTH = 10;
     public static final int CHUNK_WIDTH = 16;
     public static final int CHUNK_HEIGHT = 128;
     public static final int CHUNK_DEPTH = 16;
@@ -39,7 +41,9 @@ public class World {
     private int close;
     private int far;
 
-    public World() {
+    private final Player player;
+
+    public World(final Player player) {
         this.chunkMeshPool = new ChunkMeshPool(World.WORLD_MAX_WIDTH * World.WORLD_MAX_DEPTH * 2);
         this.generator = new HeightMapTerrainGenerator();
         this.chunks = new Chunk[WORLD_MAX_WIDTH * WORLD_MAX_DEPTH];
@@ -48,17 +52,30 @@ public class World {
         this.loader = new Loader();
         this.loader.start();
 
-        this.refreshWorld(0, 0);
+        this.player = player;
+
+        final int x = Math.round(this.player.getPosition().getX()) / CHUNK_WIDTH;
+        final int z = Math.round(this.player.getPosition().getZ()) / CHUNK_DEPTH;
+        this.refreshWorld(x, z);
     }
 
-    public void update(final Vector3 position) {
-        final int x = Math.round(position.getX()) / CHUNK_WIDTH;
-        final int z = Math.round(position.getZ()) / CHUNK_DEPTH;
+    public void update(final Time time) {
+        final int x = Math.round(this.player.getPosition().getX()) / CHUNK_WIDTH;
+        final int z = Math.round(this.player.getPosition().getZ()) / CHUNK_DEPTH;
         if (this.marker.getX() != x || this.marker.getY() != z) {
             final int stepX = x - this.marker.getX();
             final int stepZ = z - this.marker.getY();
             this.marker.setXY(x, z);
             this.refreshWorld(stepX, stepZ);
+        }
+
+        // gravity
+        this.player.getPosition().setY(this.player.getPosition().getY() - time.getElapsedTime() * 10);
+
+        // collisions detection/resolution
+        Optional<Block> collidingBlock;
+        while ((collidingBlock = this.getBlockIfMatches(this.player.getPosition(), Block::isVisible)).isPresent()) {
+            this.player.getPosition().setY(collidingBlock.get().getWorldY() + 1.0f);
         }
     }
 

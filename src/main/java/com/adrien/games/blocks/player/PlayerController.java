@@ -65,11 +65,6 @@ public class PlayerController {
             }
             this.direction.add(this.side);
         }
-        if (Input.isKeyPressed(GLFW.GLFW_KEY_LEFT_CONTROL)) {
-            this.direction.add(Vector3.DOWN);
-        } else if (Input.isKeyPressed(GLFW.GLFW_KEY_SPACE)) {
-            this.direction.add(Vector3.UP);
-        }
 
         if (!this.direction.isZero()) {
             this.player.getPosition().add(this.direction.normalise().scale(elapsed * DEFAULT_MOVEMENT_SPEED));
