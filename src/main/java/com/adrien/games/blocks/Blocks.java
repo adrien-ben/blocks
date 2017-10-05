@@ -88,8 +88,6 @@ public class Blocks implements Game {
         Engine.setBlendMode(BlendMode.DEFAULT);
         GL11.glEnable(GL11.GL_CULL_FACE);
         GL11.glDepthFunc(GL11.GL_LESS);
-        //FIXME: when a chunk is being updated it is nor renderer anymore so if loading is longer that a frame we can see it disappearing an reappearing
-        //FIXME: to fix it, we should flag the chunks as 'being updated' so we can render them
         this.world.getChunks()
                 .map(Chunk::getMesh)
                 .forEach(chunkMesh -> this.chunkRenderer.renderChunk(chunkMesh, this.camera, this.ambientLight, this.sunLight));

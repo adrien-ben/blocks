@@ -40,6 +40,8 @@ public class ChunkRenderer {
     }
 
     public void renderChunk(final ChunkMesh mesh, final Camera camera, final Light ambientLight, final DirectionalLight sunLight) {
+        //FIXME: when a chunk is being updated it is not renderer anymore so if loading is longer that a frame we can see it disappearing an reappearing
+        //FIXME: to fix it, we should flag the chunks as 'being updated' so we can render them
         mesh.uploadMesh();
         mesh.bind();
         this.indexBuffer.bind();

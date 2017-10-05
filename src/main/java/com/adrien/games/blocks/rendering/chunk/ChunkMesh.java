@@ -108,11 +108,7 @@ public class ChunkMesh {
     }
 
     public void uploadMesh() {
-        if (!this.ready) {
-            throw new IllegalStateException("A chunk mesh cannot be uploaded if it has not been updated at least once");
-        }
-
-        if (this.uploaded) {
+        if (!this.ready || this.uploaded) {
             return;
         }
 
