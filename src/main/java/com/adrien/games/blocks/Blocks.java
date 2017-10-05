@@ -72,8 +72,8 @@ public class Blocks implements Game {
 
         this.world.update(time);
 
-        final Vector3 position = new Vector3(this.player.getPosition());
-        final Vector3 direction = new Vector3(this.player.getDirection());
+        final Vector3 position = new Vector3(this.camera.getPosition());
+        final Vector3 direction = new Vector3(this.camera.getDirection());
 
         final Optional<Block> pointedBlock = this.world.getBlock(position, direction, 3, Block::isVisible);
         this.pointedBlock = pointedBlock.orElse(null);
