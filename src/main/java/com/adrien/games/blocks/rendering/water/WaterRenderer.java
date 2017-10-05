@@ -18,12 +18,11 @@ public class WaterRenderer {
     }
 
     public void render(final Camera camera, final Light ambientLight, final DirectionalLight sunLight) {
-        //FIXME: there is a weird bug when looking water from below
         this.shader.bind();
         this.setUpShader(camera, ambientLight, sunLight);
         this.mesh.bind();
 
-        GL11.glDrawArrays(GL11.GL_TRIANGLE_STRIP, 0, 6);
+        GL11.glDrawArrays(GL11.GL_TRIANGLE_STRIP, 0, 4);
 
         this.mesh.unbind();
         Shader.unbind();
