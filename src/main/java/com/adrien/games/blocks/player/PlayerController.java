@@ -51,6 +51,8 @@ public class PlayerController {
     private void handleMovement(final float elapsed) {
         this.direction.setXYZ(0, 0, 0);
         this.forward.set(this.player.getDirection());
+        Vector3.cross(this.forward, Vector3.UP, this.side);
+        Vector3.cross(Vector3.UP, this.side, this.forward);
 
         if (Input.isKeyPressed(GLFW.GLFW_KEY_W) || Input.isKeyPressed(GLFW.GLFW_KEY_S)) {
             if (Input.isKeyPressed(GLFW.GLFW_KEY_S)) {
@@ -59,7 +61,6 @@ public class PlayerController {
             this.direction.add(this.forward);
         }
         if (Input.isKeyPressed(GLFW.GLFW_KEY_D) || Input.isKeyPressed(GLFW.GLFW_KEY_A)) {
-            Vector3.cross(this.forward, Vector3.UP, this.side);
             if (Input.isKeyPressed(GLFW.GLFW_KEY_A)) {
                 this.side.scale(-1);
             }
