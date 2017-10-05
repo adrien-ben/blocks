@@ -74,7 +74,7 @@ public class World {
 
         // collisions detection/resolution
         Optional<Block> collidingBlock;
-        while ((collidingBlock = this.getBlockIfMatches(this.player.getPosition(), Block::isVisible)).isPresent()) {
+        while ((collidingBlock = this.getBlockIfMatches(this.player.getPosition(), Block::isNotAir)).isPresent()) {
             this.player.getPosition().setY(collidingBlock.get().getWorldY() + 1.0f);
         }
     }
