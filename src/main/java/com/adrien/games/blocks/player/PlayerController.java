@@ -10,7 +10,6 @@ import org.lwjgl.glfw.GLFW;
 public class PlayerController {
 
     private static final float DEFAULT_DEGREES_PER_PIXEL = 0.15f;
-    private static final float DEFAULT_MOVEMENT_SPEED = 30f;
 
     private final Player player;
     private final Vector3 forward;
@@ -68,7 +67,7 @@ public class PlayerController {
         }
 
         if (!this.direction.isZero()) {
-            this.player.getPosition().add(this.direction.normalise().scale(elapsed * DEFAULT_MOVEMENT_SPEED));
+            this.player.getPosition().add(this.direction.normalise().scale(elapsed * this.player.getSpeed()));
         }
     }
 

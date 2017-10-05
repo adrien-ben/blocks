@@ -43,7 +43,7 @@ public class Blocks implements Game {
 
         final Configuration conf = Configuration.getInstance();
 
-        this.player = new Player(new Vector3(0f, World.WATER_LEVEL + 1.8f, 0f), new Vector3(0, 0, 1));
+        this.player = new Player(new Vector3(0f, World.WATER_LEVEL + 1.8f, 0f), new Vector3(0, 0, 1), 10f);
         this.playerController = new PlayerController(this.player);
 
         this.camera = new Camera(new Vector3(this.player.getPosition()), new Vector3(this.player.getDirection()), new Vector3(0, 1, 0),
