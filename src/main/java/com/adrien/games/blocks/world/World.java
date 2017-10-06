@@ -28,6 +28,7 @@ public class World {
     public static final int CHUNK_DEPTH = 16;
     public static final int BLOCK_PER_CHUNK = CHUNK_WIDTH * CHUNK_HEIGHT * CHUNK_DEPTH;
     public static final int WATER_LEVEL = CHUNK_HEIGHT / 2;
+    private static final int ACCELERATION_CONSTANT = 100;
 
     private final ChunkMeshPool chunkMeshPool;
     private final TerrainGenerator generator;
@@ -70,12 +71,18 @@ public class World {
         }
 
         // gravity
-        this.player.getPosition().setY(this.player.getPosition().getY() - time.getElapsedTime() * 10);
+        final float currentYVelocity = this.player.getVelocity().getY();
+        this.player.getVelocity().setY(currentYVelocity - time.getElapsedTime() * ACCELERATION_CONSTANT);
+
+        // player movement
+        final Vector3 scaledVelocity = new Vector3(this.player.getVelocity()).scale(time.getElapsedTime());
+        this.player.getPosition().add(scaledVelocity);
 
         // collisions detection/resolution
         Optional<Block> collidingBlock;
         while ((collidingBlock = this.getBlockIfMatches(this.player.getPosition(), Block::isNotAir)).isPresent()) {
             this.player.getPosition().setY(collidingBlock.get().getWorldY() + 1.0f);
+            this.player.getVelocity().setY(0);
         }
     }
 

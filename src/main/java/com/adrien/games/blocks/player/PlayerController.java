@@ -1,7 +1,6 @@
 package com.adrien.games.blocks.player;
 
 import com.adrien.games.bagl.core.Input;
-import com.adrien.games.bagl.core.Time;
 import com.adrien.games.bagl.core.math.Matrix4;
 import com.adrien.games.bagl.core.math.Vector2;
 import com.adrien.games.bagl.core.math.Vector3;
@@ -10,6 +9,7 @@ import org.lwjgl.glfw.GLFW;
 public class PlayerController {
 
     private static final float DEFAULT_DEGREES_PER_PIXEL = 0.15f;
+    private static final float INITIAL_JUMP_SPEED = 30f;
 
     private final Player player;
     private final Vector3 forward;
@@ -23,9 +23,10 @@ public class PlayerController {
         this.direction = new Vector3();
     }
 
-    public void update(final Time time) {
+    public void update() {
         this.handleRotation();
-        this.handleMovement(time.getElapsedTime());
+        this.handleMovement();
+        this.handleJump();
     }
 
     private void handleRotation() {
@@ -47,11 +48,11 @@ public class PlayerController {
         }
     }
 
-    private void handleMovement(final float elapsed) {
+    private void handleMovement() {
         this.direction.setXYZ(0, 0, 0);
         this.forward.set(this.player.getDirection());
+        this.forward.setY(0).normalise();
         Vector3.cross(this.forward, Vector3.UP, this.side);
-        Vector3.cross(Vector3.UP, this.side, this.forward);
 
         if (Input.isKeyPressed(GLFW.GLFW_KEY_W) || Input.isKeyPressed(GLFW.GLFW_KEY_S)) {
             if (Input.isKeyPressed(GLFW.GLFW_KEY_S)) {
@@ -67,7 +68,19 @@ public class PlayerController {
         }
 
         if (!this.direction.isZero()) {
-            this.player.getPosition().add(this.direction.normalise().scale(elapsed * this.player.getSpeed()));
+            final Vector3 movement = this.direction.normalise().scale(this.player.getSpeed());
+            this.player.getVelocity().setX(movement.getX());
+            this.player.getVelocity().setZ(movement.getZ());
+        } else {
+            this.player.getVelocity().setX(0);
+            this.player.getVelocity().setZ(0);
+        }
+    }
+
+    private void handleJump() {
+        if (Input.wasKeyPressed(GLFW.GLFW_KEY_SPACE)) {
+            final float currentYVelocity = this.player.getVelocity().getY();
+            this.player.getVelocity().setY(currentYVelocity + INITIAL_JUMP_SPEED);
         }
     }
 

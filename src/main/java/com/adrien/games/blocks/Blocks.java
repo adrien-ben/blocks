@@ -66,7 +66,7 @@ public class Blocks implements Game {
 
     @Override
     public void update(final Time time) {
-        this.playerController.update(time);
+        this.playerController.update();
         this.camera.setPosition(Vector3.add(this.player.getPosition(), new Vector3(0, 1.8f, 0)));
         this.camera.setDirection(this.player.getDirection());
 
