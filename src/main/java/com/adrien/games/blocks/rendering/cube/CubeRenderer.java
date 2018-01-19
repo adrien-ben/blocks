@@ -1,8 +1,8 @@
 package com.adrien.games.blocks.rendering.cube;
 
-import com.adrien.games.bagl.core.Camera;
-import com.adrien.games.bagl.core.math.Vector3;
+import com.adrien.games.bagl.core.camera.Camera;
 import com.adrien.games.bagl.rendering.Shader;
+import org.joml.Vector3f;
 import org.lwjgl.opengl.GL11;
 
 public class CubeRenderer {
@@ -17,7 +17,7 @@ public class CubeRenderer {
         this.mesh = new CubeMesh();
     }
 
-    public void renderCube(final Vector3 position, final Camera camera) {
+    public void renderCube(final Vector3f position, final Camera camera) {
         this.mesh.bind();
         this.shader.bind();
         this.shader.setUniform("uVP", camera.getViewProj());

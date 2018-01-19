@@ -1,6 +1,6 @@
 package com.adrien.games.blocks.rendering.water;
 
-import com.adrien.games.bagl.core.Camera;
+import com.adrien.games.bagl.core.camera.Camera;
 import com.adrien.games.bagl.rendering.Shader;
 import com.adrien.games.bagl.rendering.light.DirectionalLight;
 import com.adrien.games.bagl.rendering.light.Light;

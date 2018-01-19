@@ -1,9 +1,9 @@
 package com.adrien.games.blocks.player;
 
 import com.adrien.games.bagl.core.Input;
-import com.adrien.games.bagl.core.math.Matrix4;
-import com.adrien.games.bagl.core.math.Vector2;
-import com.adrien.games.bagl.core.math.Vector3;
+import com.adrien.games.bagl.core.math.Vectors;
+import org.joml.Vector2f;
+import org.joml.Vector3f;
 import org.lwjgl.glfw.GLFW;
 
 public class PlayerController {
@@ -12,15 +12,15 @@ public class PlayerController {
     private static final float INITIAL_JUMP_SPEED = 30f;
 
     private final Player player;
-    private final Vector3 forward;
-    private final Vector3 side;
-    private final Vector3 direction;
+    private final Vector3f forward;
+    private final Vector3f side;
+    private final Vector3f direction;
 
     public PlayerController(final Player player) {
         this.player = player;
-        this.forward = new Vector3();
-        this.side = new Vector3();
-        this.direction = new Vector3();
+        this.forward = new Vector3f();
+        this.side = new Vector3f();
+        this.direction = new Vector3f();
     }
 
     public void update() {
@@ -30,18 +30,18 @@ public class PlayerController {
     }
 
     private void handleRotation() {
-        final Vector2 mouseDelta = Input.getMouseDelta();
-        if (!mouseDelta.isZero()) {
-            this.forward.set(this.player.getDirection()).normalise();
-            Vector3.cross(this.forward, Vector3.UP, this.side);
+        final Vector2f mouseDelta = Input.getMouseDelta();
+        if (!Vectors.isZero(mouseDelta)) {
+            this.forward.set(this.player.getDirection()).normalize();
+            this.forward.cross(Vectors.VEC3_UP, this.side);
 
-            if (mouseDelta.getY() != 0) {
-                float vAngle = (float) Math.toRadians(mouseDelta.getY() * DEFAULT_DEGREES_PER_PIXEL);
-                Vector3.transform(Matrix4.createRotation(this.side, vAngle), this.forward, 0, this.forward);
+            if (mouseDelta.y() != 0) {
+                float vAngle = (float) Math.toRadians(mouseDelta.y() * DEFAULT_DEGREES_PER_PIXEL);
+                this.forward.rotateAxis(vAngle, this.side.x(), this.side.y(), this.side.z());
             }
-            if (mouseDelta.getX() != 0) {
-                float hAngle = -(float) Math.toRadians(mouseDelta.getX() * DEFAULT_DEGREES_PER_PIXEL);
-                Vector3.transform(Matrix4.createRotation(Vector3.UP, hAngle), this.forward, 0, this.forward);
+            if (mouseDelta.x() != 0) {
+                float hAngle = -(float) Math.toRadians(mouseDelta.x() * DEFAULT_DEGREES_PER_PIXEL);
+                this.forward.rotateAxis(hAngle, 0, 1, 0);
             }
 
             this.player.getDirection().set(this.forward);
@@ -49,38 +49,37 @@ public class PlayerController {
     }
 
     private void handleMovement() {
-        this.direction.setXYZ(0, 0, 0);
-        this.forward.set(this.player.getDirection());
-        this.forward.setY(0).normalise();
-        Vector3.cross(this.forward, Vector3.UP, this.side);
+        this.direction.set(0, 0, 0);
+        this.forward.set(this.player.getDirection().x(), 0, this.player.getDirection().z());
+        this.forward.cross(Vectors.VEC3_UP, this.side);
 
         if (Input.isKeyPressed(GLFW.GLFW_KEY_W) || Input.isKeyPressed(GLFW.GLFW_KEY_S)) {
             if (Input.isKeyPressed(GLFW.GLFW_KEY_S)) {
-                this.forward.scale(-1);
+                this.forward.mul(-1);
             }
             this.direction.add(this.forward);
         }
         if (Input.isKeyPressed(GLFW.GLFW_KEY_D) || Input.isKeyPressed(GLFW.GLFW_KEY_A)) {
             if (Input.isKeyPressed(GLFW.GLFW_KEY_A)) {
-                this.side.scale(-1);
+                this.side.mul(-1);
             }
             this.direction.add(this.side);
         }
 
-        if (!this.direction.isZero()) {
-            final Vector3 movement = this.direction.normalise().scale(this.player.getSpeed());
-            this.player.getVelocity().setX(movement.getX());
-            this.player.getVelocity().setZ(movement.getZ());
+        if (!Vectors.isZero(this.direction)) {
+            final Vector3f movement = this.direction.normalize().mul(this.player.getSpeed());
+            this.player.getVelocity().setComponent(0, movement.x());
+            this.player.getVelocity().setComponent(2, movement.z());
         } else {
-            this.player.getVelocity().setX(0);
-            this.player.getVelocity().setZ(0);
+            this.player.getVelocity().setComponent(0, 0);
+            this.player.getVelocity().setComponent(2, 0);
         }
     }
 
     private void handleJump() {
         if (Input.wasKeyPressed(GLFW.GLFW_KEY_SPACE)) {
-            final float currentYVelocity = this.player.getVelocity().getY();
-            this.player.getVelocity().setY(currentYVelocity + INITIAL_JUMP_SPEED);
+            final float currentYVelocity = this.player.getVelocity().y();
+            this.player.getVelocity().setComponent(1, currentYVelocity + INITIAL_JUMP_SPEED);
         }
     }
 

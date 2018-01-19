@@ -1,7 +1,6 @@
 package com.adrien.games.blocks.world;
 
 import com.adrien.games.bagl.core.Time;
-import com.adrien.games.bagl.core.math.Vector3;
 import com.adrien.games.blocks.player.Player;
 import com.adrien.games.blocks.rendering.chunk.ChunkMeshPool;
 import com.adrien.games.blocks.utils.Point;
@@ -11,6 +10,7 @@ import com.adrien.games.blocks.world.terrain.generator.HeightMapTerrainGenerator
 import com.adrien.games.blocks.world.terrain.generator.TerrainGenerator;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.joml.Vector3f;
 
 import java.util.Objects;
 import java.util.Optional;
@@ -55,14 +55,14 @@ public class World {
 
         this.player = player;
 
-        final int x = Math.round(this.player.getPosition().getX()) / CHUNK_WIDTH;
-        final int z = Math.round(this.player.getPosition().getZ()) / CHUNK_DEPTH;
+        final int x = Math.round(this.player.getPosition().x()) / CHUNK_WIDTH;
+        final int z = Math.round(this.player.getPosition().z()) / CHUNK_DEPTH;
         this.refreshWorld(x, z);
     }
 
     public void update(final Time time) {
-        final int x = Math.round(this.player.getPosition().getX()) / CHUNK_WIDTH;
-        final int z = Math.round(this.player.getPosition().getZ()) / CHUNK_DEPTH;
+        final int x = Math.round(this.player.getPosition().x()) / CHUNK_WIDTH;
+        final int z = Math.round(this.player.getPosition().z()) / CHUNK_DEPTH;
         if (this.marker.getX() != x || this.marker.getY() != z) {
             final int stepX = x - this.marker.getX();
             final int stepZ = z - this.marker.getY();
@@ -71,29 +71,29 @@ public class World {
         }
 
         // gravity
-        final float currentYVelocity = this.player.getVelocity().getY();
-        this.player.getVelocity().setY(currentYVelocity - time.getElapsedTime() * ACCELERATION_CONSTANT);
+        final float currentYVelocity = this.player.getVelocity().y();
+        this.player.getVelocity().setComponent(1, currentYVelocity - time.getElapsedTime() * ACCELERATION_CONSTANT);
 
         // player movement
-        final Vector3 scaledVelocity = new Vector3(this.player.getVelocity()).scale(time.getElapsedTime());
+        final Vector3f scaledVelocity = new Vector3f(this.player.getVelocity()).mul(time.getElapsedTime());
         this.player.getPosition().add(scaledVelocity);
 
         // collisions detection/resolution
         Optional<Block> collidingBlock;
         while ((collidingBlock = this.getBlockIfMatches(this.player.getPosition(), Block::isNotAir)).isPresent()) {
-            this.player.getPosition().setY(collidingBlock.get().getWorldY() + 1.0f);
-            this.player.getVelocity().setY(0);
+            this.player.getPosition().setComponent(1, collidingBlock.get().getWorldY() + 1.0f);
+            this.player.getVelocity().setComponent(1, 0);
         }
     }
 
-    public boolean removeBlock(final Vector3 position) {
+    public boolean removeBlock(final Vector3f position) {
         return this.addBlock(position, BlockType.AIR);
     }
 
-    public boolean addBlock(final Vector3 position, final BlockType type) {
-        final int x = (int) Math.floor(position.getX());
-        final int y = (int) Math.floor(position.getY());
-        final int z = (int) Math.floor(position.getZ());
+    public boolean addBlock(final Vector3f position, final BlockType type) {
+        final int x = (int) Math.floor(position.x());
+        final int y = (int) Math.floor(position.y());
+        final int z = (int) Math.floor(position.z());
 
         final int chunkX = (int) Math.floor((float) x / CHUNK_WIDTH);
         final int chunkY = (int) Math.floor((float) y / CHUNK_HEIGHT);
@@ -110,10 +110,10 @@ public class World {
         return false;
     }
 
-    public Optional<Block> getBlock(final Vector3 position, final Vector3 direction, final float maxDistance, final Predicate<Block> predicate) {
+    public Optional<Block> getBlock(final Vector3f position, final Vector3f direction, final float maxDistance, final Predicate<Block> predicate) {
         float distance = 0;
         final float step = 0.25f;
-        direction.normalise().scale(step);
+        direction.normalize().mul(step);
         Optional<Block> block = Optional.empty();
         while (distance <= maxDistance && !(block = this.getBlockIfMatches(position, predicate)).isPresent()) {
             position.add(direction);
@@ -122,10 +122,10 @@ public class World {
         return block;
     }
 
-    private Optional<Block> getBlockIfMatches(final Vector3 position, final Predicate<Block> predicate) {
-        final int x = (int) Math.floor(position.getX());
-        final int y = (int) Math.floor(position.getY());
-        final int z = (int) Math.floor(position.getZ());
+    private Optional<Block> getBlockIfMatches(final Vector3f position, final Predicate<Block> predicate) {
+        final int x = (int) Math.floor(position.x());
+        final int y = (int) Math.floor(position.y());
+        final int z = (int) Math.floor(position.z());
 
         final int chunkX = (int) Math.floor((float) x / CHUNK_WIDTH);
         final int chunkY = (int) Math.floor((float) y / CHUNK_HEIGHT);

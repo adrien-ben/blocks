@@ -1,30 +1,31 @@
 package com.adrien.games.blocks.player;
 
-import com.adrien.games.bagl.core.math.Vector3;
+
+import org.joml.Vector3f;
 
 public class Player {
 
-    private final Vector3 position;
-    private final Vector3 direction;
-    private final Vector3 velocity;
+    private final Vector3f position;
+    private final Vector3f direction;
+    private final Vector3f velocity;
     private float speed;
 
-    public Player(final Vector3 position, final Vector3 direction, final float speed) {
+    public Player(final Vector3f position, final Vector3f direction, final float speed) {
         this.position = position;
         this.direction = direction;
-        this.velocity = new Vector3();
+        this.velocity = new Vector3f();
         this.speed = speed;
     }
 
-    public Vector3 getPosition() {
+    public Vector3f getPosition() {
         return position;
     }
 
-    public Vector3 getDirection() {
+    public Vector3f getDirection() {
         return direction;
     }
 
-    public Vector3 getVelocity() {
+    public Vector3f getVelocity() {
         return velocity;
     }
 

@@ -1,7 +1,7 @@
 package com.adrien.games.blocks;
 
 import com.adrien.games.bagl.core.*;
-import com.adrien.games.bagl.core.math.Vector3;
+import com.adrien.games.bagl.core.camera.Camera;
 import com.adrien.games.bagl.rendering.BlendMode;
 import com.adrien.games.bagl.rendering.light.DirectionalLight;
 import com.adrien.games.bagl.rendering.light.Light;
@@ -13,6 +13,7 @@ import com.adrien.games.blocks.rendering.water.WaterRenderer;
 import com.adrien.games.blocks.world.Chunk;
 import com.adrien.games.blocks.world.World;
 import com.adrien.games.blocks.world.block.Block;
+import org.joml.Vector3f;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
 
@@ -29,7 +30,7 @@ public class Blocks implements Game {
     private Block pointedBlock;
 
     private Light ambientLight = new Light(0.3f, Color.WHITE);
-    private DirectionalLight sunLight = new DirectionalLight(0.8f, Color.WHITE, new Vector3(1.2f, -2.0f, 3.0f));
+    private DirectionalLight sunLight = new DirectionalLight(0.8f, Color.WHITE, new Vector3f(1.2f, -2.0f, 3.0f));
 
     private ChunkRenderer chunkRenderer;
     private CubeRenderer cubeRenderer;
@@ -43,10 +44,10 @@ public class Blocks implements Game {
 
         final Configuration conf = Configuration.getInstance();
 
-        this.player = new Player(new Vector3(0f, World.WATER_LEVEL + 1.8f, 0f), new Vector3(0, 0, 1), 10f);
+        this.player = new Player(new Vector3f(0f, World.WATER_LEVEL + 1.8f, 0f), new Vector3f(0, 0, 1), 10f);
         this.playerController = new PlayerController(this.player);
 
-        this.camera = new Camera(new Vector3(this.player.getPosition()), new Vector3(this.player.getDirection()), new Vector3(0, 1, 0),
+        this.camera = new Camera(new Vector3f(this.player.getPosition()), new Vector3f(this.player.getDirection()), new Vector3f(0, 1, 0),
                 (float) Math.toRadians(70f), (float) conf.getXResolution() / conf.getYResolution(), 0.1f, 200f);
 
         this.world = new World(this.player);
@@ -67,19 +68,19 @@ public class Blocks implements Game {
     @Override
     public void update(final Time time) {
         this.playerController.update();
-        this.camera.setPosition(Vector3.add(this.player.getPosition(), new Vector3(0, 1.8f, 0)));
+        this.camera.setPosition(new Vector3f(this.player.getPosition()).add(new Vector3f(0f, 1.8f, 0f)));
         this.camera.setDirection(this.player.getDirection());
 
         this.world.update(time);
 
-        final Vector3 position = new Vector3(this.camera.getPosition());
-        final Vector3 direction = new Vector3(this.camera.getDirection());
+        final Vector3f position = new Vector3f(this.camera.getPosition());
+        final Vector3f direction = new Vector3f(this.camera.getDirection());
 
         final Optional<Block> pointedBlock = this.world.getBlock(position, direction, 3, Block::isVisible);
         this.pointedBlock = pointedBlock.orElse(null);
 
         if (Input.wasMouseButtonPressed(GLFW.GLFW_MOUSE_BUTTON_2)) {
-            pointedBlock.ifPresent(block -> this.world.removeBlock(new Vector3(block.getWorldX(), block.getWorldY(), block.getWorldZ())));
+            pointedBlock.ifPresent(block -> this.world.removeBlock(new Vector3f(block.getWorldX(), block.getWorldY(), block.getWorldZ())));
         }
     }
 
@@ -95,7 +96,7 @@ public class Blocks implements Game {
         Engine.setBlendMode(BlendMode.TRANSPARENCY);
         GL11.glDepthFunc(GL11.GL_LEQUAL);
         if (Objects.nonNull(this.pointedBlock)) {
-            this.cubeRenderer.renderCube(new Vector3(this.pointedBlock.getWorldX(), this.pointedBlock.getWorldY(), this.pointedBlock.getWorldZ()),
+            this.cubeRenderer.renderCube(new Vector3f(this.pointedBlock.getWorldX(), this.pointedBlock.getWorldY(), this.pointedBlock.getWorldZ()),
                     this.camera);
         }
 
