@@ -11,9 +11,10 @@ public class CubeRenderer {
     private CubeMesh mesh;
 
     public CubeRenderer() {
-        this.shader = new Shader().addVertexShader("cube.vert")
-                .addFragmentShader("cube.frag")
-                .compile();
+        this.shader = Shader.builder()
+                .vertexPath("cube.vert")
+                .fragmentPath("cube.frag")
+                .build();
         this.mesh = new CubeMesh();
     }
 

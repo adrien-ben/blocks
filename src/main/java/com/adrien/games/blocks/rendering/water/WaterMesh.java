@@ -18,9 +18,10 @@ public class WaterMesh {
 
     public WaterMesh() {
         try (final MemoryStack stack = MemoryStack.stackPush()) {
-            this.vBuffer = new VertexBuffer(stack.bytes(MIN, MAX, MAX, MAX, MIN, MIN, MAX, MIN), new VertexBufferParams()
+            this.vBuffer = new VertexBuffer(stack.bytes(MIN, MAX, MAX, MAX, MIN, MIN, MAX, MIN), VertexBufferParams.builder()
                     .dataType(DataType.BYTE)
-                    .element(new VertexElement(0, ELEMENT_COUNT)));
+                    .element(new VertexElement(0, ELEMENT_COUNT))
+                    .build());
         }
         this.vArray = new VertexArray();
         this.vArray.bind();

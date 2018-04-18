@@ -22,9 +22,9 @@ public class ChunkRenderer {
     private final IndexBuffer indexBuffer;
 
     public ChunkRenderer() {
-        this.shader = new Shader().addVertexShader("chunk.vert").addFragmentShader("chunk.frag").compile();
-        this.blockAtlas = new Texture(FileUtils.getResourceAbsolutePath("/textures/blocks.png"),
-                new TextureParameters().minFilter(Filter.NEAREST).magFilter(Filter.NEAREST));
+        this.shader = Shader.builder().vertexPath("chunk.vert").fragmentPath("chunk.frag").build();
+        this.blockAtlas = Texture.fromFile(FileUtils.getResourceAbsolutePath("/textures/blocks.png"),
+                TextureParameters.builder().minFilter(Filter.NEAREST).magFilter(Filter.NEAREST));
         this.indexBuffer = this.generateIndices();
     }
 

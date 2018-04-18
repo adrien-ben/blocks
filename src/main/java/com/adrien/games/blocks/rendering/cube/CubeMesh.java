@@ -38,9 +38,10 @@ public class CubeMesh {
                     NEG, NEG, NEG,
                     POS, POS, NEG,
                     NEG, POS, NEG);
-            return new VertexBuffer(vertices, new VertexBufferParams()
+            return new VertexBuffer(vertices, VertexBufferParams.builder()
                     .dataType(DataType.BYTE)
-                    .element(new VertexElement(0, 3)));
+                    .element(new VertexElement(0, 3))
+                    .build());
         }
     }
 

@@ -60,16 +60,18 @@ public class ChunkMesh {
         this.positions = MemoryUtil.memAllocShort(MAX_VERTEX_COUNT * ELEMENT_PER_POSITION);
         this.coordinatesAndNormals = MemoryUtil.memAlloc(MAX_VERTEX_COUNT * ELEMENT_PER_COORDINATES_PLUS_NORMALS);
 
-        this.positionVBuffer = new VertexBuffer(this.positions, new VertexBufferParams()
+        this.positionVBuffer = new VertexBuffer(this.positions, VertexBufferParams.builder()
                 .dataType(DataType.SHORT)
                 .usage(BufferUsage.DYNAMIC_DRAW)
-                .element(new VertexElement(0, ELEMENT_PER_POSITION)));
+                .element(new VertexElement(0, ELEMENT_PER_POSITION))
+                .build());
 
-        this.coordinateVBuffer = new VertexBuffer(this.coordinatesAndNormals, new VertexBufferParams()
+        this.coordinateVBuffer = new VertexBuffer(this.coordinatesAndNormals, VertexBufferParams.builder()
                 .dataType(DataType.BYTE)
                 .usage(BufferUsage.DYNAMIC_DRAW)
                 .element(new VertexElement(1, ELEMENT_PER_COORDINATES, true))
-                .element(new VertexElement(2, ELEMENT_PER_NORMALS)));
+                .element(new VertexElement(2, ELEMENT_PER_NORMALS))
+                .build());
 
         this.vArray = new VertexArray();
         this.vArray.bind();
