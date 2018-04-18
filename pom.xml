@@ -14,10 +14,10 @@
     <properties>
         <!-- Dependencies versions -->
         <bagl.version>1.0.0-SNAPSHOT</bagl.version>
-        <java.version>1.8</java.version>
+        <java.version>1.10</java.version>
         <junit.version>4.12</junit.version>
         <!-- Plugins versions -->
-        <maven.compiler.plugin.version>3.5.1</maven.compiler.plugin.version>
+        <maven.compiler.plugin.version>3.7.0</maven.compiler.plugin.version>
     </properties>
 
     <dependencies>
