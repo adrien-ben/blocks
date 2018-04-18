@@ -57,7 +57,8 @@ public class World {
 
         final int x = Math.round(this.player.getPosition().x()) / CHUNK_WIDTH;
         final int z = Math.round(this.player.getPosition().z()) / CHUNK_DEPTH;
-        this.refreshWorld(x, z);
+        this.marker.setXY(x, z);
+        this.refreshWorld(x, z, true);
     }
 
     public void update(final Time time) {
@@ -67,7 +68,7 @@ public class World {
             final int stepX = x - this.marker.getX();
             final int stepZ = z - this.marker.getY();
             this.marker.setXY(x, z);
-            this.refreshWorld(stepX, stepZ);
+            this.refreshWorld(stepX, stepZ, false);
         }
 
         // gravity
@@ -142,7 +143,7 @@ public class World {
         return Optional.of(block);
     }
 
-    private void refreshWorld(final int stepX, final int stepZ) {
+    private void refreshWorld(final int stepX, final int stepZ, final boolean directLoad) {
         LOG.trace("Loading world around {}", this.marker);
 
         this.left = this.marker.getX() - WORLD_MAX_WIDTH / 2;
@@ -170,7 +171,11 @@ public class World {
                 } else {
                     final Chunk newChunk = new Chunk(this.left + x, 0, this.close + z, this.chunkMeshPool, this.generator);
                     this.buffer[index] = newChunk;
-                    this.loader.load(newChunk);
+                    if (directLoad) {
+                        newChunk.load();
+                    } else {
+                        this.loader.load(newChunk);
+                    }
                 }
             }
         }
