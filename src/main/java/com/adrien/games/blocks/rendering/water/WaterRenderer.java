@@ -13,7 +13,10 @@ public class WaterRenderer {
     private WaterMesh mesh;
 
     public WaterRenderer() {
-        this.shader = Shader.builder().vertexPath("water.vert").fragmentPath("water.frag").build();
+        this.shader = Shader.builder()
+                .vertexPath("classpath:/shaders/water.vert")
+                .fragmentPath("classpath:/shaders/water.frag")
+                .build();
         this.mesh = new WaterMesh();
     }
 

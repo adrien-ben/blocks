@@ -12,8 +12,8 @@ public class CubeRenderer {
 
     public CubeRenderer() {
         this.shader = Shader.builder()
-                .vertexPath("cube.vert")
-                .fragmentPath("cube.frag")
+                .vertexPath("classpath:/shaders/cube.vert")
+                .fragmentPath("classpath:/shaders/cube.frag")
                 .build();
         this.mesh = new CubeMesh();
     }
