@@ -3,8 +3,14 @@ package com.adrien.games.blocks;
 import com.adrien.games.bagl.core.*;
 import com.adrien.games.bagl.core.camera.Camera;
 import com.adrien.games.bagl.rendering.BlendMode;
+import com.adrien.games.bagl.rendering.FrameBuffer;
+import com.adrien.games.bagl.rendering.FrameBufferParameters;
 import com.adrien.games.bagl.rendering.light.DirectionalLight;
 import com.adrien.games.bagl.rendering.light.Light;
+import com.adrien.games.bagl.rendering.postprocess.PostProcessor;
+import com.adrien.games.bagl.rendering.postprocess.steps.FxaaStep;
+import com.adrien.games.bagl.rendering.postprocess.steps.LumaStep;
+import com.adrien.games.bagl.rendering.texture.Format;
 import com.adrien.games.blocks.player.Player;
 import com.adrien.games.blocks.player.PlayerController;
 import com.adrien.games.blocks.rendering.chunk.ChunkRenderer;
@@ -36,6 +42,9 @@ public class Blocks implements Game {
     private CubeRenderer cubeRenderer;
     private WaterRenderer waterRenderer;
 
+    private FrameBuffer frameBuffer;
+    private PostProcessor postProcessor;
+
     @Override
     public void init() {
         Input.setMouseMode(MouseMode.DISABLED);
@@ -55,6 +64,12 @@ public class Blocks implements Game {
         this.chunkRenderer = new ChunkRenderer();
         this.cubeRenderer = new CubeRenderer();
         this.waterRenderer = new WaterRenderer();
+
+        this.frameBuffer = new FrameBuffer(conf.getXResolution(), conf.getYResolution(), FrameBufferParameters.builder().colorOutputFormat(Format.RGBA8).build());
+        this.postProcessor = new PostProcessor(
+                new LumaStep(conf.getXResolution(), conf.getYResolution()),
+                new FxaaStep(conf.getXResolution(), conf.getYResolution(), conf.getFxaaPresets())
+        );
     }
 
     @Override
@@ -63,6 +78,8 @@ public class Blocks implements Game {
         this.chunkRenderer.destroy();
         this.cubeRenderer.destroy();
         this.waterRenderer.destroy();
+        this.frameBuffer.destroy();
+        this.postProcessor.destroy();
     }
 
     @Override
@@ -86,6 +103,9 @@ public class Blocks implements Game {
 
     @Override
     public void render() {
+        frameBuffer.bind();
+        frameBuffer.clear(Color.CORNFLOWER_BLUE);
+
         Engine.setBlendMode(BlendMode.DEFAULT);
         GL11.glEnable(GL11.GL_CULL_FACE);
         GL11.glDepthFunc(GL11.GL_LESS);
@@ -103,6 +123,10 @@ public class Blocks implements Game {
         GL11.glDisable(GL11.GL_CULL_FACE);
         this.waterRenderer.render(this.camera, this.ambientLight, this.sunLight);
 
+        frameBuffer.unbind();
+
+        Engine.setBlendMode(BlendMode.NONE);
+        postProcessor.process(frameBuffer.getColorTexture(0));
     }
 
     public static void main(final String[] args) {

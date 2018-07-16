@@ -6,7 +6,7 @@
 
     <groupId>com.adrien.games</groupId>
     <artifactId>blocks</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>0.0.1</version>
 
     <name>Blocks</name>
     <description>Minecraft clone... Kind of...</description>
@@ -15,7 +15,7 @@
         <java.version>1.10</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <!-- Dependencies versions -->
-        <bagl.version>1.0.0-SNAPSHOT</bagl.version>
+        <bagl.version>0.0.1</bagl.version>
         <!-- Plugins versions -->
         <maven.compiler.plugin.version>3.7.0</maven.compiler.plugin.version>
     </properties>
