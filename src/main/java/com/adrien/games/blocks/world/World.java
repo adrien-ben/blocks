@@ -1,6 +1,5 @@
 package com.adrien.games.blocks.world;
 
-import com.adrien.games.bagl.core.Time;
 import com.adrien.games.blocks.player.Player;
 import com.adrien.games.blocks.rendering.chunk.ChunkMeshPool;
 import com.adrien.games.blocks.utils.Point;
@@ -8,6 +7,7 @@ import com.adrien.games.blocks.world.block.Block;
 import com.adrien.games.blocks.world.block.BlockType;
 import com.adrien.games.blocks.world.terrain.generator.HeightMapTerrainGenerator;
 import com.adrien.games.blocks.world.terrain.generator.TerrainGenerator;
+import com.adrienben.games.bagl.engine.Time;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.joml.Vector3f;

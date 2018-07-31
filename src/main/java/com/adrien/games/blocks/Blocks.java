@@ -1,16 +1,5 @@
 package com.adrien.games.blocks;
 
-import com.adrien.games.bagl.core.*;
-import com.adrien.games.bagl.core.camera.Camera;
-import com.adrien.games.bagl.rendering.BlendMode;
-import com.adrien.games.bagl.rendering.FrameBuffer;
-import com.adrien.games.bagl.rendering.FrameBufferParameters;
-import com.adrien.games.bagl.rendering.light.DirectionalLight;
-import com.adrien.games.bagl.rendering.light.Light;
-import com.adrien.games.bagl.rendering.postprocess.PostProcessor;
-import com.adrien.games.bagl.rendering.postprocess.steps.FxaaStep;
-import com.adrien.games.bagl.rendering.postprocess.steps.LumaStep;
-import com.adrien.games.bagl.rendering.texture.Format;
 import com.adrien.games.blocks.player.Player;
 import com.adrien.games.blocks.player.PlayerController;
 import com.adrien.games.blocks.rendering.chunk.ChunkRenderer;
@@ -19,6 +8,20 @@ import com.adrien.games.blocks.rendering.water.WaterRenderer;
 import com.adrien.games.blocks.world.Chunk;
 import com.adrien.games.blocks.world.World;
 import com.adrien.games.blocks.world.block.Block;
+import com.adrienben.games.bagl.core.Color;
+import com.adrienben.games.bagl.engine.*;
+import com.adrienben.games.bagl.engine.camera.Camera;
+import com.adrienben.games.bagl.engine.game.Game;
+import com.adrienben.games.bagl.engine.rendering.light.DirectionalLight;
+import com.adrienben.games.bagl.engine.rendering.light.Light;
+import com.adrienben.games.bagl.engine.rendering.postprocess.PostProcessor;
+import com.adrienben.games.bagl.engine.rendering.postprocess.steps.FxaaStep;
+import com.adrienben.games.bagl.engine.rendering.postprocess.steps.LumaStep;
+import com.adrienben.games.bagl.opengl.BlendMode;
+import com.adrienben.games.bagl.opengl.FrameBuffer;
+import com.adrienben.games.bagl.opengl.FrameBufferParameters;
+import com.adrienben.games.bagl.opengl.OpenGL;
+import com.adrienben.games.bagl.opengl.texture.Format;
 import org.joml.Vector3f;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
@@ -48,7 +51,7 @@ public class Blocks implements Game {
     @Override
     public void init() {
         Input.setMouseMode(MouseMode.DISABLED);
-        Engine.setClearColor(Color.CORNFLOWER_BLUE);
+        OpenGL.setClearColor(Color.CORNFLOWER_BLUE);
         GL11.glEnable(GL11.GL_DEPTH_TEST);
 
         final Configuration conf = Configuration.getInstance();
@@ -106,14 +109,14 @@ public class Blocks implements Game {
         frameBuffer.bind();
         frameBuffer.clear(Color.CORNFLOWER_BLUE);
 
-        Engine.setBlendMode(BlendMode.DEFAULT);
+        OpenGL.setBlendMode(BlendMode.DEFAULT);
         GL11.glEnable(GL11.GL_CULL_FACE);
         GL11.glDepthFunc(GL11.GL_LESS);
         this.world.getChunks()
                 .map(Chunk::getMesh)
                 .forEach(chunkMesh -> this.chunkRenderer.renderChunk(chunkMesh, this.camera, this.ambientLight, this.sunLight));
 
-        Engine.setBlendMode(BlendMode.TRANSPARENCY);
+        OpenGL.setBlendMode(BlendMode.TRANSPARENCY);
         GL11.glDepthFunc(GL11.GL_LEQUAL);
         if (Objects.nonNull(this.pointedBlock)) {
             this.cubeRenderer.renderCube(new Vector3f(this.pointedBlock.getWorldX(), this.pointedBlock.getWorldY(), this.pointedBlock.getWorldZ()),
@@ -125,7 +128,7 @@ public class Blocks implements Game {
 
         frameBuffer.unbind();
 
-        Engine.setBlendMode(BlendMode.NONE);
+        OpenGL.setBlendMode(BlendMode.NONE);
         postProcessor.process(frameBuffer.getColorTexture(0));
     }
 

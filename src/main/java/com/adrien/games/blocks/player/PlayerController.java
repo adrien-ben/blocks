@@ -1,7 +1,7 @@
 package com.adrien.games.blocks.player;
 
-import com.adrien.games.bagl.core.Input;
-import com.adrien.games.bagl.core.math.Vectors;
+import com.adrienben.games.bagl.core.math.Vectors;
+import com.adrienben.games.bagl.engine.Input;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.lwjgl.glfw.GLFW;

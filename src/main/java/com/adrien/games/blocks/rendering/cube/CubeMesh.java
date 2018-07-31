@@ -1,8 +1,8 @@
 package com.adrien.games.blocks.rendering.cube;
 
-import com.adrien.games.bagl.rendering.BufferUsage;
-import com.adrien.games.bagl.rendering.DataType;
-import com.adrien.games.bagl.rendering.vertex.*;
+import com.adrienben.games.bagl.opengl.BufferUsage;
+import com.adrienben.games.bagl.opengl.DataType;
+import com.adrienben.games.bagl.opengl.vertex.*;
 import org.lwjgl.system.MemoryStack;
 
 import java.nio.ByteBuffer;

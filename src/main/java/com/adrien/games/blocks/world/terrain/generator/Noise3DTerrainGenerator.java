@@ -1,10 +1,10 @@
 package com.adrien.games.blocks.world.terrain.generator;
 
-import com.adrien.games.bagl.core.math.Noise;
 import com.adrien.games.blocks.world.Chunk;
 import com.adrien.games.blocks.world.World;
 import com.adrien.games.blocks.world.block.Block;
 import com.adrien.games.blocks.world.block.BlockType;
+import com.adrienben.games.bagl.core.math.Noise;
 
 public class Noise3DTerrainGenerator implements TerrainGenerator {
 

@@ -1,15 +1,15 @@
 package com.adrien.games.blocks.rendering.chunk;
 
-import com.adrien.games.bagl.core.camera.Camera;
-import com.adrien.games.bagl.rendering.BufferUsage;
-import com.adrien.games.bagl.rendering.Shader;
-import com.adrien.games.bagl.rendering.light.DirectionalLight;
-import com.adrien.games.bagl.rendering.light.Light;
-import com.adrien.games.bagl.rendering.texture.Filter;
-import com.adrien.games.bagl.rendering.texture.Texture;
-import com.adrien.games.bagl.rendering.texture.TextureParameters;
-import com.adrien.games.bagl.rendering.vertex.IndexBuffer;
-import com.adrien.games.bagl.utils.FileUtils;
+import com.adrienben.games.bagl.core.io.ResourcePath;
+import com.adrienben.games.bagl.engine.camera.Camera;
+import com.adrienben.games.bagl.engine.rendering.light.DirectionalLight;
+import com.adrienben.games.bagl.engine.rendering.light.Light;
+import com.adrienben.games.bagl.opengl.BufferUsage;
+import com.adrienben.games.bagl.opengl.shader.Shader;
+import com.adrienben.games.bagl.opengl.texture.Filter;
+import com.adrienben.games.bagl.opengl.texture.Texture;
+import com.adrienben.games.bagl.opengl.texture.TextureParameters;
+import com.adrienben.games.bagl.opengl.vertex.IndexBuffer;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.system.MemoryUtil;
 
@@ -23,10 +23,10 @@ public class ChunkRenderer {
 
     public ChunkRenderer() {
         this.shader = Shader.builder()
-                .vertexPath("classpath:/shaders/chunk.vert")
-                .fragmentPath("classpath:/shaders/chunk.frag")
+                .vertexPath(ResourcePath.get("classpath:/shaders/chunk.vert"))
+                .fragmentPath(ResourcePath.get("classpath:/shaders/chunk.frag"))
                 .build();
-        this.blockAtlas = Texture.fromFile(FileUtils.getResourceAbsolutePath("/textures/blocks.png"),
+        this.blockAtlas = Texture.fromFile(ResourcePath.get("classpath:/textures/blocks.png"),
                 TextureParameters.builder().minFilter(Filter.NEAREST).magFilter(Filter.NEAREST));
         this.indexBuffer = this.generateIndices();
     }

@@ -1,10 +1,11 @@
 package com.adrien.games.blocks.rendering.water;
 
-import com.adrien.games.bagl.core.camera.Camera;
-import com.adrien.games.bagl.rendering.Shader;
-import com.adrien.games.bagl.rendering.light.DirectionalLight;
-import com.adrien.games.bagl.rendering.light.Light;
 import com.adrien.games.blocks.world.World;
+import com.adrienben.games.bagl.core.io.ResourcePath;
+import com.adrienben.games.bagl.engine.camera.Camera;
+import com.adrienben.games.bagl.engine.rendering.light.DirectionalLight;
+import com.adrienben.games.bagl.engine.rendering.light.Light;
+import com.adrienben.games.bagl.opengl.shader.Shader;
 import org.lwjgl.opengl.GL11;
 
 public class WaterRenderer {
@@ -14,8 +15,8 @@ public class WaterRenderer {
 
     public WaterRenderer() {
         this.shader = Shader.builder()
-                .vertexPath("classpath:/shaders/water.vert")
-                .fragmentPath("classpath:/shaders/water.frag")
+                .vertexPath(ResourcePath.get("classpath:/shaders/water.vert"))
+                .fragmentPath(ResourcePath.get("classpath:/shaders/water.frag"))
                 .build();
         this.mesh = new WaterMesh();
     }

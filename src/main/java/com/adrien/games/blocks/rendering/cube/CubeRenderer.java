@@ -1,7 +1,8 @@
 package com.adrien.games.blocks.rendering.cube;
 
-import com.adrien.games.bagl.core.camera.Camera;
-import com.adrien.games.bagl.rendering.Shader;
+import com.adrienben.games.bagl.core.io.ResourcePath;
+import com.adrienben.games.bagl.engine.camera.Camera;
+import com.adrienben.games.bagl.opengl.shader.Shader;
 import org.joml.Vector3f;
 import org.lwjgl.opengl.GL11;
 
@@ -12,8 +13,8 @@ public class CubeRenderer {
 
     public CubeRenderer() {
         this.shader = Shader.builder()
-                .vertexPath("classpath:/shaders/cube.vert")
-                .fragmentPath("classpath:/shaders/cube.frag")
+                .vertexPath(ResourcePath.get("classpath:/shaders/cube.vert"))
+                .fragmentPath(ResourcePath.get("classpath:/shaders/cube.frag"))
                 .build();
         this.mesh = new CubeMesh();
     }
