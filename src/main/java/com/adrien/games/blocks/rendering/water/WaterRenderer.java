@@ -14,7 +14,7 @@ public class WaterRenderer {
     private WaterMesh mesh;
 
     public WaterRenderer() {
-        this.shader = Shader.builder()
+        this.shader = Shader.pipelineBuilder()
                 .vertexPath(ResourcePath.get("classpath:/shaders/water.vert"))
                 .fragmentPath(ResourcePath.get("classpath:/shaders/water.frag"))
                 .build();

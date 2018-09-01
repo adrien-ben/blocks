@@ -12,7 +12,7 @@ public class CubeRenderer {
     private CubeMesh mesh;
 
     public CubeRenderer() {
-        this.shader = Shader.builder()
+        this.shader = Shader.pipelineBuilder()
                 .vertexPath(ResourcePath.get("classpath:/shaders/cube.vert"))
                 .fragmentPath(ResourcePath.get("classpath:/shaders/cube.frag"))
                 .build();

@@ -1,7 +1,7 @@
 package com.adrien.games.blocks.rendering.cube;
 
-import com.adrienben.games.bagl.opengl.BufferUsage;
 import com.adrienben.games.bagl.opengl.DataType;
+import com.adrienben.games.bagl.opengl.buffer.BufferUsage;
 import com.adrienben.games.bagl.opengl.vertex.*;
 import org.lwjgl.system.MemoryStack;
 

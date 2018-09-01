@@ -4,10 +4,11 @@ import com.adrienben.games.bagl.core.io.ResourcePath;
 import com.adrienben.games.bagl.engine.camera.Camera;
 import com.adrienben.games.bagl.engine.rendering.light.DirectionalLight;
 import com.adrienben.games.bagl.engine.rendering.light.Light;
-import com.adrienben.games.bagl.opengl.BufferUsage;
+import com.adrienben.games.bagl.opengl.buffer.BufferUsage;
 import com.adrienben.games.bagl.opengl.shader.Shader;
 import com.adrienben.games.bagl.opengl.texture.Filter;
 import com.adrienben.games.bagl.opengl.texture.Texture;
+import com.adrienben.games.bagl.opengl.texture.Texture2D;
 import com.adrienben.games.bagl.opengl.texture.TextureParameters;
 import com.adrienben.games.bagl.opengl.vertex.IndexBuffer;
 import org.lwjgl.opengl.GL11;
@@ -22,11 +23,11 @@ public class ChunkRenderer {
     private final IndexBuffer indexBuffer;
 
     public ChunkRenderer() {
-        this.shader = Shader.builder()
+        this.shader = Shader.pipelineBuilder()
                 .vertexPath(ResourcePath.get("classpath:/shaders/chunk.vert"))
                 .fragmentPath(ResourcePath.get("classpath:/shaders/chunk.frag"))
                 .build();
-        this.blockAtlas = Texture.fromFile(ResourcePath.get("classpath:/textures/blocks.png"),
+        this.blockAtlas = Texture2D.fromFile(ResourcePath.get("classpath:/textures/blocks.png"),
                 TextureParameters.builder().minFilter(Filter.NEAREST).magFilter(Filter.NEAREST));
         this.indexBuffer = this.generateIndices();
     }
@@ -57,7 +58,7 @@ public class ChunkRenderer {
         this.setUpShader(camera, ambientLight, sunLight);
         GL11.glDrawElements(GL11.GL_TRIANGLES, mesh.getFaceCount() * ChunkMesh.INDICES_PER_FACE, GL11.GL_UNSIGNED_INT, 0);
         Shader.unbind();
-        Texture.unbind();
+        blockAtlas.unbind();
         this.indexBuffer.unbind();
         mesh.unbind();
     }
