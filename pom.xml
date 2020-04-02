@@ -12,12 +12,12 @@
     <description>Minecraft clone... Kind of...</description>
 
     <properties>
-        <java.version>12</java.version>
+        <java.version>14</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <!-- Dependencies versions -->
         <bagl.version>0.0.6</bagl.version>
         <!-- Plugins versions -->
-        <maven.compiler.plugin.version>3.8.0</maven.compiler.plugin.version>
+        <maven.compiler.plugin.version>3.8.1</maven.compiler.plugin.version>
     </properties>
 
     <dependencies>
