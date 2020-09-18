@@ -4,6 +4,12 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
+    <parent>
+        <groupId>com.adrienben.games</groupId>
+        <artifactId>bagl-parent</artifactId>
+        <version>0.0.6</version>
+    </parent>
+
     <groupId>com.adrien.games</groupId>
     <artifactId>blocks</artifactId>
     <version>0.0.1</version>
@@ -11,34 +17,11 @@
     <name>Blocks</name>
     <description>Minecraft clone... Kind of...</description>
 
-    <properties>
-        <java.version>14</java.version>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <!-- Dependencies versions -->
-        <bagl.version>0.0.6</bagl.version>
-        <!-- Plugins versions -->
-        <maven.compiler.plugin.version>3.8.1</maven.compiler.plugin.version>
-    </properties>
-
     <dependencies>
         <dependency>
             <groupId>com.adrienben.games</groupId>
             <artifactId>bagl-engine</artifactId>
-            <version>${bagl.version}</version>
         </dependency>
     </dependencies>
-
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>${maven.compiler.plugin.version}</version>
-                <configuration>
-                    <release>${java.version}</release>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
 
 </project>
